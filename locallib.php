@@ -194,6 +194,19 @@ class assign_submission_mahara extends assign_submission_plugin {
     }
 
     /**
+     * Release submitted view for assessment.
+     *
+     * @global stdClass $USER
+     * @param int $viewid View ID
+     * @param array $viewoutcomes Outcomes data
+     * @return mixed
+     */
+    function mnet_release_submited_view($viewid, $viewoutcomes) {
+        global $USER;
+        return $this->mnet_send_request('release_submitted_view', array($viewid, $viewoutcomes, $USER->username));
+    }
+
+    /**
      * Send Mnet request to Mahara portfolio.
      *
      * @global stdClass $CFG
@@ -205,7 +218,7 @@ class assign_submission_mahara extends assign_submission_plugin {
         global $CFG;
 
         $error = false;
-        $responsedata = array();
+        $responsedata = false;
         if (!is_enabled_auth('mnet')) {
             $error = get_string('authmnetdisabled', 'mnet');
         } else if (!has_capability('moodle/site:mnetlogintoremote', get_context_instance(CONTEXT_SYSTEM), NULL, false)) {
@@ -453,7 +466,14 @@ class assign_submission_mahara extends assign_submission_plugin {
      */
     public function delete_instance() {
         global $DB;
-        // Will throw exception on failure.
+        // First of all release all pages on remote site.
+        $records = $DB->get_records('assignsubmission_mahara', array('assignment'=>$this->assignment->get_instance()->id));
+        foreach ($records as $record) {
+            if ($this->mnet_release_submited_view($record->viewid, array()) === false) {
+                throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
+            }
+        }
+        // Now delete records.
         $DB->delete_records('assignsubmission_mahara', array('assignment'=>$this->assignment->get_instance()->id));
 
         return true;
