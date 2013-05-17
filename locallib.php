@@ -330,38 +330,6 @@ class assign_submission_mahara extends assign_submission_plugin {
     }
 
     /**
-     * Produce a list of files suitable for export that represent this submission
-     *
-     * @param stdClass $submission - For this is the submission data
-     * @global stdClass $DB
-     * @return array - return an array of files indexed by filename
-     */
-    public function get_files(stdClass $submission) {
-        global $DB;
-        $files = array();
-        $onlinetextsubmission = $this->get_onlinetext_submission($submission->id);
-        if ($onlinetextsubmission) {
-            $user = $DB->get_record("user", array("id"=>$submission->userid),'id,username,firstname,lastname', MUST_EXIST);
-
-            $prefix = clean_filename(fullname($user) . "_" .$submission->userid . "_");
-            $finaltext = str_replace('@@PLUGINFILE@@/', $prefix, $onlinetextsubmission->onlinetext);
-            $submissioncontent = "<html><body>". format_text($finaltext, $onlinetextsubmission->onlineformat, array('context'=>$this->assignment->get_context())). "</body></html>";      //fetched from database
-
-            $files[get_string('onlinetextfilename', 'assignsubmission_onlinetext')] = array($submissioncontent);
-
-            $fs = get_file_storage();
-
-            $fsfiles = $fs->get_area_files($this->assignment->get_context()->id, 'assignsubmission_onlinetext', ASSIGNSUBMISSION_ONLINETEXT_FILEAREA, $submission->id, "timemodified", false);
-
-            foreach ($fsfiles as $file) {
-                $files[$file->get_filename()] = $file;
-            }
-        }
-
-        return $files;
-    }
-
-    /**
      * Display the saved text content from the editor in the view table
      *
      * @param stdClass $submission
