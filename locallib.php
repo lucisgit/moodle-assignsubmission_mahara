@@ -47,6 +47,7 @@ class assign_submission_mahara extends assign_submission_plugin {
    /**
     * Get Mahara submission information from the database
     *
+    * @global stdClass $DB
     * @param  int $submissionid
     * @return mixed
     */
@@ -144,7 +145,8 @@ class assign_submission_mahara extends assign_submission_plugin {
         $views = $this->get_views();
 
         $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
-        $remotehost->jumpurl = $CFG->wwwroot . '/auth/mnet/jump.php?hostid=' . $remotehost->id;
+        $url = new moodle_url('/auth/mnet/jump.php', array('hostid' => $remotehost->id));
+        $remotehost->jumpurl = $url->out();
         // Updating section header and adding description line.
         $mform->getElement('header_mahara')->_text = $remotehost->name;
         $mform->addElement('static', '', '', get_string('selectmaharaview', 'assignsubmission_mahara', $remotehost));
@@ -182,9 +184,9 @@ class assign_submission_mahara extends assign_submission_plugin {
     /**
      * Send Mnet request to Mahara portfolio.
      *
+     * @global stdClass $CFG
      * @param string $methodname name of remote method to call
      * @param array $parameters list of method parameters
-     * @global stdClass $CFG
      * @return mixed $responsedata Mnet response
      */
     private function send_mnet_request($methodname, $parameters) {
@@ -276,13 +278,14 @@ class assign_submission_mahara extends assign_submission_plugin {
      */
     public function is_empty(stdClass $submission) {
         $maharasubmission = $this->get_mahara_submission($submission->id);
-
         return empty($maharasubmission);
     }
 
      /**
       * Display onlinetext word count in the submission status table
       *
+      * @global stdClass $DB
+      * @global stdClass $OUTPUT
       * @param stdClass $submission
       * @param bool $showviewlink - If the summary has been truncated set this to true
       * @return string
@@ -310,6 +313,7 @@ class assign_submission_mahara extends assign_submission_plugin {
      * Produce a list of files suitable for export that represent this submission
      *
      * @param stdClass $submission - For this is the submission data
+     * @global stdClass $DB
      * @return array - return an array of files indexed by filename
      */
     public function get_files(stdClass $submission) {
@@ -345,15 +349,11 @@ class assign_submission_mahara extends assign_submission_plugin {
      */
     public function view(stdClass $submission) {
         $result = '';
-
         $maharasubmission = $this->get_mahara_submission($submission->id);
-
         if ($maharasubmission) {
             // render for portfolio API
             $result .= $maharasubmission->viewurl;
-
         }
-
         return $result;
     }
 
@@ -434,18 +434,23 @@ class assign_submission_mahara extends assign_submission_plugin {
     /**
      * Formatting for log info
      *
+     * @global stdClass $DB
      * @param stdClass $submission The new submission
      * @return string
      */
     public function format_for_log(stdClass $submission) {
+        global $DB;
         // Format the info for each submission plugin add_to_log
         $maharasubmission = $this->get_mahara_submission($submission->id);
+        $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
+        $maharasubmission->remotehostname = $remotehost->name;
         return get_string('outputforlog', 'assignsubmission_mahara', $maharasubmission);
     }
 
     /**
      * The assignment has been deleted - cleanup
      *
+     * @global stdClass $DB
      * @return bool
      */
     public function delete_instance() {
