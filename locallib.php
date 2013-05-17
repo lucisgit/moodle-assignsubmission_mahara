@@ -276,6 +276,20 @@ class assign_submission_mahara extends assign_submission_plugin {
         }
     }
 
+     /**
+      * Process submission for grading
+      *
+      * @param stdClass $submission
+      * @return void
+      */
+    function submit_for_grading(stdClass $submission) {
+        $maharasubmission = $this->get_mahara_submission($submission->id);
+        // Lock view on Mahara side as it has been submitted for assessment.
+        if (!$response = $this->mnet_submit_view($maharasubmission->viewid)) {
+            throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
+        }
+    }
+
     /**
      * Check if submission has been made
      *
