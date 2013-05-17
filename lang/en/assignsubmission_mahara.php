@@ -32,7 +32,8 @@ $string['pluginname'] = 'Mahara portfolio';
 $string['selectmaharaview'] = 'Select one of your "{$a->name}" portfolio pages from this complete list, or <a href="{$a->jumpurl}">click here</a> to visit "{$a->name}" and create a page.';
 $string['site'] = 'Site';
 $string['site_help'] = 'This setting lets you select which Mahara site your students should submit their pages from.';
-$string['outputforlog'] = 'Mahara portfolio submitted: {$a->viewtitle} (id: {$a->viewid})';
+$string['outputforlog'] = '{$a->remotehostname}: {$a->viewtitle} (view id: {$a->viewid})';
+$string['viewsaved'] = '<a href="{$a->jumpurl}">Click here</a> to view "{$a->viewtitle}" page in "{$a->name}" portfolio.';
 
 
 $string['clicktopreview'] = 'click to preview in full-size popup';

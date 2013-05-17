@@ -330,17 +330,27 @@ class assign_submission_mahara extends assign_submission_plugin {
     }
 
     /**
-     * Display the saved text content from the editor in the view table
+     * Display the view of submission.
      *
+     * We should not normally hit this, as we override view link in view_summary
+     * method. But just in case user shomehow hit viewing from Moodle context,
+     * display the link to portfolio page.
+     *
+     * @global stdClass $DB
      * @param stdClass $submission
      * @return string
      */
     public function view(stdClass $submission) {
+        global $DB;
+
         $result = '';
         $maharasubmission = $this->get_mahara_submission($submission->id);
         if ($maharasubmission) {
-            // render for portfolio API
-            $result .= $maharasubmission->viewurl;
+            $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
+            $url = new moodle_url('/auth/mnet/jump.php', array('hostid' => $remotehost->id, 'wantsurl' => $maharasubmission->viewurl));
+            $remotehost->jumpurl = $url->out();
+            $remotehost->viewtitle = $maharasubmission->viewtitle;
+            $result .= get_string('viewsaved', 'assignsubmission_mahara', $remotehost);
         }
         return $result;
     }
