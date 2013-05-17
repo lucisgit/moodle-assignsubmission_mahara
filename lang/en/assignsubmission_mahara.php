@@ -24,7 +24,7 @@
 
 $string['enabled'] = 'Mahara portfolio';
 $string['enabled_help'] = "If enabled, students are able to submit Mahara pages for assessment in Moodle. The Mahara site must already be configured for mnet networking with this Moodle site.";
-$string['errorgettingviews'] = 'Attempt to retrieve pages resulted in error: {$a}';
+$string['errormnetrequest'] = 'Attempt to send mnet request resulted in error: {$a}';
 $string['mahara'] = 'Mahara portfolio';
 $string['nomaharahostsfound'] = 'No mahara hosts found.';
 $string['noviewscreated'] = 'No pages found.';

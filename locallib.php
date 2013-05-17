@@ -221,7 +221,7 @@ class assign_submission_mahara extends assign_submission_plugin {
             }
         }
         if ($error) {
-            throw new moodle_exception('errorgettingviews', 'assignsubmission_mahara', '', $error);
+            $this->set_error($error);
         }
         return $responsedata;
     }
