@@ -141,10 +141,7 @@ class assign_submission_mahara extends assign_submission_plugin {
         $submissionid = $submission ? $submission->id : 0;
         $maharasubmission = $this->get_mahara_submission($submissionid);
         // Getting views (pages) user have in linked site.
-        list($error, $views) = $this->get_views();
-        if ($error) {
-            throw new moodle_exception('errorgettingviews', 'assignsubmission_mahara', '', $error);
-        }
+        $views = $this->get_views();
 
         $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
         $remotehost->jumpurl = $CFG->wwwroot . '/auth/mnet/jump.php?hostid=' . $remotehost->id;
@@ -173,15 +170,28 @@ class assign_submission_mahara extends assign_submission_plugin {
      * Retrieve user views from Mahara portfolio.
      *
      * @param string $query Search query
-     * @global stdClass $CFG
      * @global stdClass $USER
-     * @return array
+     * @return mixed
      */
     function get_views($query = '') {
-        global $CFG, $USER;
+        global $USER;
+
+        return $this->send_mnet_request('get_views_for_user', array($USER->username, $query));
+    }
+
+    /**
+     * Send Mnet request to Mahara portfolio.
+     *
+     * @param string $methodname name of remote method to call
+     * @param array $parameters list of method parameters
+     * @global stdClass $CFG
+     * @return mixed $responsedata Mnet response
+     */
+    private function send_mnet_request($methodname, $parameters) {
+        global $CFG;
 
         $error = false;
-        $viewdata = array();
+        $responsedata = array();
         if (!is_enabled_auth('mnet')) {
             $error = get_string('authmnetdisabled', 'mnet');
         } else if (!has_capability('moodle/site:mnetlogintoremote', get_context_instance(CONTEXT_SYSTEM), NULL, false)) {
@@ -189,14 +199,17 @@ class assign_submission_mahara extends assign_submission_plugin {
         } else {
             // Set up the RPC request.
             require_once $CFG->dirroot . '/mnet/xmlrpc/client.php';
-            $mnet_sp = $this->get_mnet_peer();
+            require_once $CFG->dirroot . '/mnet/peer.php';
+            $mnetpeer = new mnet_peer();
+            $mnetpeer->set_id($this->get_config('mnethostid'));
             $mnetrequest = new mnet_xmlrpc_client();
-            $mnetrequest->set_method('mod/mahara/rpclib.php/get_views_for_user');
-            $mnetrequest->add_param($USER->username);
-            $mnetrequest->add_param($query);
+            $mnetrequest->set_method('mod/mahara/rpclib.php/' . $methodname);
+            foreach ($parameters as $parameter) {
+                $mnetrequest->add_param($parameter);
+            }
 
-            if ($mnetrequest->send($mnet_sp) === true) {
-                $viewdata = $mnetrequest->response;
+            if ($mnetrequest->send($mnetpeer) === true) {
+                $responsedata = $mnetrequest->response;
             } else {
                 $error = "RPC mod/mahara/rpclib.php/get_views_for_user:<br/>";
                 foreach ($mnetrequest->error as $errormessage) {
@@ -205,21 +218,10 @@ class assign_submission_mahara extends assign_submission_plugin {
                 }
             }
         }
-        return array($error, $viewdata);
-    }
-
-    /**
-     * Get mnet peer object
-     *
-     * @global stdClass $CFG
-     * @return stdClass
-     */
-    function get_mnet_peer() {
-        global $CFG;
-        require_once $CFG->dirroot . '/mnet/peer.php';
-        $mnetpeer = new mnet_peer();
-        $mnetpeer->set_id($this->get_config('mnethostid'));
-        return $mnetpeer;
+        if ($error) {
+            throw new moodle_exception('errorgettingviews', 'assignsubmission_mahara', '', $error);
+        }
+        return $responsedata;
     }
 
      /**
