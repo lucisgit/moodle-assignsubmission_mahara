@@ -128,21 +128,22 @@ class assign_submission_mahara extends assign_submission_plugin {
     /**
      * Add elements to user submission form
      *
+     * @global stdClass $DB
      * @param mixed $submission stdClass|null
      * @param MoodleQuickForm $mform
      * @param stdClass $data
      * @param int $userid
-     * @global stdClass $DB
-     * @global stdClass $CFG
      * @return bool
      */
     public function get_form_elements_for_user($submission, MoodleQuickForm $mform, stdClass $data, $userid) {
-        global $DB, $CFG;
+        global $DB;
 
         $submissionid = $submission ? $submission->id : 0;
         $maharasubmission = $this->get_mahara_submission($submissionid);
         // Getting views (pages) user have in linked site.
-        $views = $this->get_views();
+        if (!$views = $this->mnet_get_views()) {
+            throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
+        }
 
         $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
         $url = new moodle_url('/auth/mnet/jump.php', array('hostid' => $remotehost->id));
@@ -171,14 +172,25 @@ class assign_submission_mahara extends assign_submission_plugin {
     /**
      * Retrieve user views from Mahara portfolio.
      *
-     * @param string $query Search query
      * @global stdClass $USER
+     * @param string $query Search query
      * @return mixed
      */
-    function get_views($query = '') {
+    function mnet_get_views($query = '') {
         global $USER;
+        return $this->mnet_send_request('get_views_for_user', array($USER->username, $query));
+    }
 
-        return $this->send_mnet_request('get_views_for_user', array($USER->username, $query));
+    /**
+     * Submit view for assessment.
+     *
+     * @global stdClass $USER
+     * @param int $viewid View ID
+     * @return mixed
+     */
+    function mnet_submit_view($viewid) {
+        global $USER;
+        return $this->mnet_send_request('submit_view_for_assessment', array($USER->username, $viewid));
     }
 
     /**
@@ -189,7 +201,7 @@ class assign_submission_mahara extends assign_submission_plugin {
      * @param array $parameters list of method parameters
      * @return mixed $responsedata Mnet response
      */
-    private function send_mnet_request($methodname, $parameters) {
+    private function mnet_send_request($methodname, $parameters) {
         global $CFG;
 
         $error = false;
@@ -213,7 +225,7 @@ class assign_submission_mahara extends assign_submission_plugin {
             if ($mnetrequest->send($mnetpeer) === true) {
                 $responsedata = $mnetrequest->response;
             } else {
-                $error = "RPC mod/mahara/rpclib.php/get_views_for_user:<br/>";
+                $error = "RPC mod/mahara/rpclib.php/" . $methodname . ":<br/>";
                 foreach ($mnetrequest->error as $errormessage) {
                     list($code, $errormessage) = array_map('trim',explode(':', $errormessage, 2));
                     $error .= "ERROR $code:<br/>$errormessage<br/>";
@@ -229,40 +241,34 @@ class assign_submission_mahara extends assign_submission_plugin {
      /**
       * Save submission data to the database
       *
+      * @global stdClass $DB
       * @param stdClass $submission
       * @param stdClass $data
-      * @global stdClass $DB
-      * @global stdClass $CFG
-      * @global stdClass $USER
       * @return bool
       */
      public function save(stdClass $submission, stdClass $data) {
-        global $DB, $CFG, $USER;
+        global $DB;
 
         $maharasubmission = $this->get_mahara_submission($submission->id);
 
-        require_once $CFG->dirroot . '/mnet/xmlrpc/client.php';
-        $mnet_sp = $this->get_mnet_peer();
-        $mnetrequest = new mnet_xmlrpc_client();
-        $mnetrequest->set_method('mod/mahara/rpclib.php/submit_view_for_assessment');
-        $mnetrequest->add_param($USER->username);
-        $mnetrequest->add_param($data->viewid);
-
-        if ($mnetrequest->send($mnet_sp) !== true) {
+        if (!$views = $this->mnet_get_views()) {
+            // Wrap recorded error in language string and return false.
+            $this->set_error(get_string('errormnetrequest', 'assignsubmission_mahara', $this->get_error()));
             return false;
         }
-        $mnetresponse = $mnetrequest->response;
+        $keys = array_flip($views['ids']);
+        $viewdata = $views['data'][$keys[$data->viewid]];
 
         if ($maharasubmission) {
             $maharasubmission->viewid = $data->viewid;
-            $maharasubmission->viewurl = $mnetresponse['url'];
-            $maharasubmission->viewtitle = clean_text($mnetresponse['title']);
+            $maharasubmission->viewurl = $viewdata['url'];
+            $maharasubmission->viewtitle = clean_text($viewdata['title']);
             return $DB->update_record('assignsubmission_mahara', $maharasubmission);
         } else {
             $maharasubmission = new stdClass();
             $maharasubmission->viewid = $data->viewid;
-            $maharasubmission->viewurl = $mnetresponse['url'];
-            $maharasubmission->viewtitle = clean_text($mnetresponse['title']);
+            $maharasubmission->viewurl = $viewdata['url'];
+            $maharasubmission->viewtitle = clean_text($viewdata['title']);
 
             $maharasubmission->submission = $submission->id;
             $maharasubmission->assignment = $this->assignment->get_instance()->id;
