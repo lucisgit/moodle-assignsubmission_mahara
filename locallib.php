@@ -304,6 +304,48 @@ class assign_submission_mahara extends assign_submission_plugin {
     }
 
     /**
+      * Process locking
+      *
+      * @param stdClass $submission
+      * @return void
+      */
+    function lock(stdClass $submission) {
+        $maharasubmission = $this->get_mahara_submission($submission->id);
+        // Lock view on Mahara side as it has been submitted for assessment.
+        if (!$response = $this->mnet_submit_view($maharasubmission->viewid)) {
+            throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
+        }
+    }
+
+    /**
+      * Process unlocking
+      *
+      * @param stdClass $submission
+      * @return void
+      */
+    function unlock(stdClass $submission) {
+        $maharasubmission = $this->get_mahara_submission($submission->id);
+        // Unlock view on Mahara side as it has been unlocked.
+        if ($this->mnet_release_submited_view($maharasubmission->viewid, array()) === false) {
+            throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
+        }
+    }
+
+    /**
+      * Process reverting to draft
+      *
+      * @param stdClass $submission
+      * @return void
+      */
+    function revert_to_draft(stdClass $submission) {
+        $maharasubmission = $this->get_mahara_submission($submission->id);
+        // Unlock view on Mahara side as it has been reverted to draft.
+        if ($this->mnet_release_submited_view($maharasubmission->viewid, array()) === false) {
+            throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
+        }
+    }
+
+    /**
      * Check if submission has been made
      *
      * @param stdClass $submission
@@ -381,7 +423,6 @@ class assign_submission_mahara extends assign_submission_plugin {
         }
         return false;
     }
-
 
     /**
      * Upgrade the settings from the old assignment to the new plugin based one
