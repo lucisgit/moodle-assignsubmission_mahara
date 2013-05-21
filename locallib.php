@@ -418,7 +418,7 @@ class assign_submission_mahara extends assign_submission_plugin {
      * @return bool True if upgrade is possible
      */
     public function can_upgrade($type, $version) {
-        if ($type == 'mahara' && $version >= 2010102600) {
+        if ($type == 'mahara' && $version >= 2011070110) {
             return true;
         }
         return false;
