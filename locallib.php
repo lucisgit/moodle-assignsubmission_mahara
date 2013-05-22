@@ -433,7 +433,7 @@ class assign_submission_mahara extends assign_submission_plugin {
      * @return bool Was it a success?
      */
     public function upgrade_settings(context $oldcontext, stdClass $oldassignment, & $log) {
-        // first upgrade settings (nothing to do)
+        $this->set_config('mnethostid', $oldassignment->var2);
         return true;
     }
 
@@ -450,36 +450,20 @@ class assign_submission_mahara extends assign_submission_plugin {
     public function upgrade(context $oldcontext, stdClass $oldassignment, stdClass $oldsubmission, stdClass $submission, & $log) {
         global $DB;
 
-        $onlinetextsubmission = new stdClass();
-        $onlinetextsubmission->onlinetext = $oldsubmission->data1;
-        $onlinetextsubmission->onlineformat = $oldsubmission->data2;
+        $maharadata = unserialize($oldsubmission->data2);
 
-        $onlinetextsubmission->submission = $submission->id;
-        $onlinetextsubmission->assignment = $this->assignment->get_instance()->id;
+        $maharasubmission = new stdClass();
+        $maharasubmission->viewid = $maharadata['id'];
+        $maharasubmission->viewurl = $maharadata['url'];
+        $maharasubmission->viewtitle = $maharadata['title'];
 
-        if ($onlinetextsubmission->onlinetext === null) {
-            $onlinetextsubmission->onlinetext = '';
-        }
+        $maharasubmission->submission = $submission->id;
+        $maharasubmission->assignment = $this->assignment->get_instance()->id;
 
-        if ($onlinetextsubmission->onlineformat === null) {
-            $onlinetextsubmission->onlineformat = editors_get_preferred_format();
-        }
-
-        if (!$DB->insert_record('assignsubmission_onlinetext', $onlinetextsubmission) > 0) {
+        if (!$DB->insert_record('assignsubmission_mahara', $maharasubmission) > 0) {
             $log .= get_string('couldnotconvertsubmission', 'mod_assign', $submission->userid);
             return false;
         }
-
-        // now copy the area files
-        $this->assignment->copy_area_files_for_upgrade($oldcontext->id,
-                                                        'mod_assignment',
-                                                        'submission',
-                                                        $oldsubmission->id,
-                                                        // New file area
-                                                        $this->assignment->get_context()->id,
-                                                        'assignsubmission_onlinetext',
-                                                        ASSIGNSUBMISSION_ONLINETEXT_FILEAREA,
-                                                        $submission->id);
         return true;
     }
 
