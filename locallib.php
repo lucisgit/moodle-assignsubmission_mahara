@@ -292,57 +292,73 @@ class assign_submission_mahara extends assign_submission_plugin {
      /**
       * Process submission for grading
       *
+      * @global stdClass $DB
       * @param stdClass $submission
       * @return void
       */
     function submit_for_grading(stdClass $submission) {
+        global $DB;
         $maharasubmission = $this->get_mahara_submission($submission->id);
         // Lock view on Mahara side as it has been submitted for assessment.
         if (!$response = $this->mnet_submit_view($maharasubmission->viewid)) {
             throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
         }
+        $maharasubmission->viewaccesskey = $response['accesskey'];
+        $DB->update_record('assignsubmission_mahara', $maharasubmission);
     }
 
     /**
       * Process locking
       *
+      * @global stdClass $DB
       * @param stdClass $submission
       * @return void
       */
     function lock(stdClass $submission) {
+        global $DB;
         $maharasubmission = $this->get_mahara_submission($submission->id);
         // Lock view on Mahara side as it has been submitted for assessment.
         if (!$response = $this->mnet_submit_view($maharasubmission->viewid)) {
             throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
         }
+        $maharasubmission->viewaccesskey = $response['accesskey'];
+        $DB->update_record('assignsubmission_mahara', $maharasubmission);
     }
 
     /**
       * Process unlocking
       *
+      * @global stdClass $DB
       * @param stdClass $submission
       * @return void
       */
     function unlock(stdClass $submission) {
+        global $DB;
         $maharasubmission = $this->get_mahara_submission($submission->id);
         // Unlock view on Mahara side as it has been unlocked.
         if ($this->mnet_release_submited_view($maharasubmission->viewid, array()) === false) {
             throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
         }
+        $maharasubmission->viewaccesskey = '';
+        $DB->update_record('assignsubmission_mahara', $maharasubmission);
     }
 
     /**
       * Process reverting to draft
       *
+      * @global stdClass $DB
       * @param stdClass $submission
       * @return void
       */
     function revert_to_draft(stdClass $submission) {
+        global $DB;
         $maharasubmission = $this->get_mahara_submission($submission->id);
         // Unlock view on Mahara side as it has been reverted to draft.
         if ($this->mnet_release_submited_view($maharasubmission->viewid, array()) === false) {
             throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
         }
+        $maharasubmission->viewaccesskey = '';
+        $DB->update_record('assignsubmission_mahara', $maharasubmission);
     }
 
     /**
@@ -356,32 +372,54 @@ class assign_submission_mahara extends assign_submission_plugin {
         return empty($maharasubmission);
     }
 
+    /**
+     * Get view URL
+     *
+     * @param stdClass $maharasubmission assignsubmission_mahara record
+     * @return stdClass $url Moodle URL object
+     */
+    public function get_view_url(stdClass $maharasubmission) {
+        global $DB;
+        $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
+        if ($maharasubmission->viewaccesskey) {
+            $maharasubmission->viewurl .= '&mt=' . $maharasubmission->viewaccesskey;
+        }
+        $url = new moodle_url('/auth/mnet/jump.php', array(
+            'hostid' => $remotehost->id,
+            'wantsurl' => $maharasubmission->viewurl,
+        ));
+        return $url;
+    }
+
      /**
       * Display onlinetext word count in the submission status table
       *
       * @global stdClass $DB
       * @global stdClass $OUTPUT
+      * @global stdClass $USER
       * @param stdClass $submission
       * @param bool $showviewlink - If the summary has been truncated set this to true
       * @return string
       */
     public function view_summary(stdClass $submission, & $showviewlink) {
-        global $OUTPUT, $DB;
+        global $OUTPUT, $DB, $USER;
 
         $maharasubmission = $this->get_mahara_submission($submission->id);
-
         // Instead of letting Moodle generate the the view link,
         // we will substitute own preview link in the summary output.
+        $link = '';
         if ($maharasubmission) {
-            $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
-            $url = new moodle_url('/auth/mnet/jump.php', array('hostid' => $remotehost->id, 'wantsurl' => $maharasubmission->viewurl));
-            $icon = $OUTPUT->pix_icon('t/preview', get_string('view' . substr($this->get_subtype(), strlen('assign')), 'mod_assign'));
-            $link = $OUTPUT->action_link(new moodle_url($url), $icon);
-            $link .= $OUTPUT->spacer(array('width'=>15));
-
-            return $link . $maharasubmission->viewtitle;
+            if ($submission->userid == $USER->id || !empty($maharasubmission->viewaccesskey)) {
+                // Either the page is viewed by the author or access code has been issued
+                $icon = $OUTPUT->pix_icon('t/preview', get_string('view' . substr($this->get_subtype(), strlen('assign')), 'mod_assign'));
+                $link .= $OUTPUT->action_link($this->get_view_url($maharasubmission), $icon);
+                $link .= $OUTPUT->spacer(array('width'=>15));
+            } else {
+                $showviewlink = true;
+            }
+        $link .= $maharasubmission->viewtitle;
         }
-        return '';
+        return $link;
     }
 
     /**
@@ -392,20 +430,26 @@ class assign_submission_mahara extends assign_submission_plugin {
      * display the link to portfolio page.
      *
      * @global stdClass $DB
+     * @global stdClass $USER
      * @param stdClass $submission
      * @return string
      */
     public function view(stdClass $submission) {
-        global $DB;
+        global $DB, $USER;
 
         $result = '';
         $maharasubmission = $this->get_mahara_submission($submission->id);
         if ($maharasubmission) {
-            $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
-            $url = new moodle_url('/auth/mnet/jump.php', array('hostid' => $remotehost->id, 'wantsurl' => $maharasubmission->viewurl));
-            $remotehost->jumpurl = $url->out();
-            $remotehost->viewtitle = $maharasubmission->viewtitle;
-            $result .= get_string('viewsaved', 'assignsubmission_mahara', $remotehost);
+            if ($submission->userid == $USER->id || !empty($maharasubmission->viewaccesskey)) {
+                // Either the page is viewed by the author or access code has been issued
+                $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
+                $url = $this->get_view_url($maharasubmission);
+                $remotehost->jumpurl = $url->out();
+                $remotehost->viewtitle = $maharasubmission->viewtitle;
+                $result .= get_string('viewsaved', 'assignsubmission_mahara', $remotehost);
+            } elseif (empty($maharasubmission->viewaccesskey)) {
+                $result .= get_string('needstobelocked', 'assignsubmission_mahara');
+            }
         }
         return $result;
     }

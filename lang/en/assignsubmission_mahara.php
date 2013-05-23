@@ -26,6 +26,7 @@ $string['enabled'] = 'Mahara portfolio';
 $string['enabled_help'] = "If enabled, students are able to submit Mahara pages for assessment in Moodle. The Mahara site must already be configured for mnet networking with this Moodle site.";
 $string['errormnetrequest'] = 'Attempt to send mnet request resulted in error: {$a}';
 $string['mahara'] = 'Mahara portfolio';
+$string['needstobelocked'] = 'Submission needs to be locked before view link will be available.';
 $string['nomaharahostsfound'] = 'No mahara hosts found.';
 $string['noviewscreated'] = 'No pages found.';
 $string['pluginname'] = 'Mahara portfolio';
@@ -34,23 +35,3 @@ $string['site'] = 'Site';
 $string['site_help'] = 'This setting lets you select which Mahara site your students should submit their pages from.';
 $string['outputforlog'] = '{$a->remotehostname}: {$a->viewtitle} (view id: {$a->viewid})';
 $string['viewsaved'] = '<a href="{$a->jumpurl}">Click here</a> to view "{$a->viewtitle}" page in "{$a->name}" portfolio.';
-
-
-$string['clicktopreview'] = 'click to preview in full-size popup';
-$string['clicktoselect'] = 'click to select page';
-
-$string['preview'] = 'Preview';
-$string['selectedview'] = 'Submitted Page';
-
-$string['title'] = 'Title';
-$string['views'] = 'Pages';
-$string['viewsby'] = 'Pages by {$a}';
-
-$string['allowonlinetextsubmissions'] = 'Enabled';
-$string['default'] = 'Enabled by default';
-$string['default_help'] = 'If set, this submission method will be enabled by default for all new assignments.';
-$string['nosubmission'] = 'Nothing has been submitted for this assignment';
-$string['onlinetextfilename'] = 'onlinetext.html';
-$string['onlinetextsubmission'] = 'Allow online text submission';
-$string['numwords'] = '({$a} words)';
-$string['numwordsforlog'] = 'Submission word count: {$a} words';
