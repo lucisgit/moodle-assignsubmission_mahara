@@ -15,15 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the version information for Mahara submission plugin
+ * This file contains the definition for the mnetservice class for Mahara submission plugin
+ *
+ * This class is just required for mnet services subscription registration
+ * during plugin installation. It does not do anything.
  *
  * @package    assignsubmission_mahara
- * @copyright  2012 Lancaster University
+ * @copyright  2013 Lancaster University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version   = 2013062400;
-$plugin->requires  = 2012062500;
-$plugin->component = 'assignsubmission_mahara';
+class mnetservice_assign_submission_mahara {
+    public function donothing() {
+    }
+}

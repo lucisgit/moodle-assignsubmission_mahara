@@ -15,15 +15,30 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the version information for Mahara submission plugin
+ * MNet publishers/subscribers definition.
  *
  * @package    assignsubmission_mahara
- * @copyright  2012 Lancaster University
+ * @copyright  2013 Lancaster University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2013062400;
-$plugin->requires  = 2012062500;
-$plugin->component = 'assignsubmission_mahara';
+$publishes = array(
+    'assign_submission_mahara' => array(
+        'apiversion' => 1,
+        'classname'  => 'mnetservice_assign_submission_mahara',
+        'filename'   => 'mnetlib.php',
+        'methods'    => array(
+            'donothing',
+        ),
+    ),
+);
+
+$subscribes = array(
+    'assign_submission_mahara' => array(
+        'get_views_for_user' => 'mod/mahara/rpclib.php/get_views_for_user',
+        'submit_view_for_assignment' => 'mod/mahara/rpclib.php/submit_view_for_assessment',
+        'release_submitted_view' => 'mod/mahara/rpclib.php/release_submitted_view',
+    ),
+);
