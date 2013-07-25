@@ -143,6 +143,18 @@ class assign_submission_mahara extends assign_submission_plugin {
         // Getting views (pages) user have in linked site.
         $views = $this->mnet_get_views();
 
+        // See if any of views are already in use, we will remove them from select.
+        $sql = "
+             SELECT viewid, submission
+             FROM
+                 {assignsubmission_mahara}
+             WHERE
+                 viewid IN (" . implode(',', $views['ids']) . ")";
+        $viewsinuse = $DB->get_records_sql($sql);
+        if ($maharasubmission) {
+            unset($viewsinuse[$maharasubmission->viewid]);
+        }
+
         $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
         $url = new moodle_url('/auth/mnet/jump.php', array('hostid' => $remotehost->id));
         $remotehost->jumpurl = $url->out();
@@ -157,7 +169,9 @@ class assign_submission_mahara extends assign_submission_plugin {
             // Build select element containing user pages
             $selectitems = array();
             foreach ($views['data'] as $view) {
-                $selectitems[$view['id']] = $view['title'];
+                if (!array_key_exists($view['id'], $viewsinuse)) {
+                    $selectitems[$view['id']] = $view['title'];
+                }
             }
             $mform->addElement('select', 'viewid', '', $selectitems);
             if ($maharasubmission) {
@@ -261,29 +275,63 @@ class assign_submission_mahara extends assign_submission_plugin {
         global $DB;
 
         $maharasubmission = $this->get_mahara_submission($submission->id);
+        if ($submission->status === 'draft') {
+            // Draft. All we need to do is just save or update submitted view data.
+            if (!$views = $this->mnet_get_views()) {
+                // Wrap recorded error in language string and return false.
+                $this->set_error(get_string('errormnetrequest', 'assignsubmission_mahara', $this->get_error()));
+                return false;
+            }
+            $keys = array_flip($views['ids']);
+            $viewdata = $views['data'][$keys[$data->viewid]];
 
-        if (!$views = $this->mnet_get_views()) {
-            // Wrap recorded error in language string and return false.
-            $this->set_error(get_string('errormnetrequest', 'assignsubmission_mahara', $this->get_error()));
-            return false;
-        }
-        $keys = array_flip($views['ids']);
-        $viewdata = $views['data'][$keys[$data->viewid]];
+            if ($maharasubmission) {
+                $maharasubmission->viewid = $data->viewid;
+                $maharasubmission->viewurl = $viewdata['url'];
+                $maharasubmission->viewtitle = clean_text($viewdata['title']);
+                return $DB->update_record('assignsubmission_mahara', $maharasubmission);
+            } else {
+                $maharasubmission = new stdClass();
+                $maharasubmission->viewid = $data->viewid;
+                $maharasubmission->viewurl = $viewdata['url'];
+                $maharasubmission->viewtitle = clean_text($viewdata['title']);
 
-        if ($maharasubmission) {
-            $maharasubmission->viewid = $data->viewid;
-            $maharasubmission->viewurl = $viewdata['url'];
-            $maharasubmission->viewtitle = clean_text($viewdata['title']);
-            return $DB->update_record('assignsubmission_mahara', $maharasubmission);
+                $maharasubmission->submission = $submission->id;
+                $maharasubmission->assignment = $this->assignment->get_instance()->id;
+                return $DB->insert_record('assignsubmission_mahara', $maharasubmission) > 0;
+            }
         } else {
-            $maharasubmission = new stdClass();
-            $maharasubmission->viewid = $data->viewid;
-            $maharasubmission->viewurl = $viewdata['url'];
-            $maharasubmission->viewtitle = clean_text($viewdata['title']);
+            // This is not the draft, but the actual submission. Process it properly.
+            // Lock submission on mahara side.
+            if (!$response = $this->mnet_submit_view($data->viewid)) {
+                throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
+            }
 
-            $maharasubmission->submission = $submission->id;
-            $maharasubmission->assignment = $this->assignment->get_instance()->id;
-            return $DB->insert_record('assignsubmission_mahara', $maharasubmission) > 0;
+            if ($maharasubmission) {
+                // If we are updating previous submission, release previous submission first.
+                if ($maharasubmission->viewid != $data->viewid) {
+                    if ($this->mnet_release_submited_view($maharasubmission->viewid, array()) === false) {
+                        throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
+                    }
+                }
+                // Update submission data.
+                $maharasubmission->viewid = $data->viewid;
+                $maharasubmission->viewurl = $response['url'];
+                $maharasubmission->viewtitle = clean_text($response['title']);
+                $maharasubmission->viewaccesskey = $response['accesskey'];
+                return $DB->update_record('assignsubmission_mahara', $maharasubmission);
+            } else {
+                // We are dealing with the new submission.
+                $maharasubmission = new stdClass();
+                $maharasubmission->viewid = $data->viewid;
+                $maharasubmission->viewurl = $response['url'];
+                $maharasubmission->viewtitle = clean_text($response['title']);
+                $maharasubmission->viewaccesskey = $response['accesskey'];
+
+                $maharasubmission->submission = $submission->id;
+                $maharasubmission->assignment = $this->assignment->get_instance()->id;
+                return $DB->insert_record('assignsubmission_mahara', $maharasubmission) > 0;
+            }
         }
     }
 
@@ -301,6 +349,7 @@ class assign_submission_mahara extends assign_submission_plugin {
         if (!$response = $this->mnet_submit_view($maharasubmission->viewid)) {
             throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
         }
+        $maharasubmission->viewurl = $response['url'];
         $maharasubmission->viewaccesskey = $response['accesskey'];
         $DB->update_record('assignsubmission_mahara', $maharasubmission);
     }
@@ -319,6 +368,7 @@ class assign_submission_mahara extends assign_submission_plugin {
         if (!$response = $this->mnet_submit_view($maharasubmission->viewid)) {
             throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
         }
+        $maharasubmission->viewurl = $response['url'];
         $maharasubmission->viewaccesskey = $response['accesskey'];
         $DB->update_record('assignsubmission_mahara', $maharasubmission);
     }
@@ -379,9 +429,6 @@ class assign_submission_mahara extends assign_submission_plugin {
     public function get_view_url(stdClass $maharasubmission) {
         global $DB;
         $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
-        if ($maharasubmission->viewaccesskey) {
-            $maharasubmission->viewurl .= '&mt=' . $maharasubmission->viewaccesskey;
-        }
         $url = new moodle_url('/auth/mnet/jump.php', array(
             'hostid' => $remotehost->id,
             'wantsurl' => $maharasubmission->viewurl,
@@ -415,7 +462,7 @@ class assign_submission_mahara extends assign_submission_plugin {
             } else {
                 $showviewlink = true;
             }
-        $link .= $maharasubmission->viewtitle;
+            $link .= $maharasubmission->viewtitle;
         }
         return $link;
     }
