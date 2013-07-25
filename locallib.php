@@ -382,13 +382,15 @@ class assign_submission_mahara extends assign_submission_plugin {
       */
     function unlock(stdClass $submission) {
         global $DB;
-        $maharasubmission = $this->get_mahara_submission($submission->id);
-        // Unlock view on Mahara side as it has been unlocked.
-        if ($this->mnet_release_submited_view($maharasubmission->viewid, array()) === false) {
-            throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
+        if ($submission->status === 'draft') {
+            $maharasubmission = $this->get_mahara_submission($submission->id);
+            // Unlock view on Mahara side as it has been unlocked.
+            if ($this->mnet_release_submited_view($maharasubmission->viewid, array()) === false) {
+                throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
+            }
+            $maharasubmission->viewaccesskey = '';
+            $DB->update_record('assignsubmission_mahara', $maharasubmission);
         }
-        $maharasubmission->viewaccesskey = '';
-        $DB->update_record('assignsubmission_mahara', $maharasubmission);
     }
 
     /**
