@@ -499,6 +499,11 @@ class assign_submission_mahara extends assign_submission_plugin {
         $maharasubmission->viewurl = $maharadata['url'];
         $maharasubmission->viewtitle = $maharadata['title'];
 
+        $url = new moodle_url($maharadata['url']);
+        if ($url->get_param('mt')) {
+            $maharasubmission->viewaccesskey = $url->get_param('mt');
+        }
+
         $maharasubmission->submission = $submission->id;
         $maharasubmission->assignment = $this->assignment->get_instance()->id;
 
