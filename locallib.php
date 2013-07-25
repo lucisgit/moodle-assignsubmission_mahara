@@ -141,9 +141,7 @@ class assign_submission_mahara extends assign_submission_plugin {
         $submissionid = $submission ? $submission->id : 0;
         $maharasubmission = $this->get_mahara_submission($submissionid);
         // Getting views (pages) user have in linked site.
-        if (!$views = $this->mnet_get_views()) {
-            throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
-        }
+        $views = $this->mnet_get_views();
 
         $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
         $url = new moodle_url('/auth/mnet/jump.php', array('hostid' => $remotehost->id));
@@ -152,7 +150,7 @@ class assign_submission_mahara extends assign_submission_plugin {
         $mform->getElement('header_mahara')->_text = $remotehost->name;
         $mform->addElement('static', '', '', get_string('selectmaharaview', 'assignsubmission_mahara', $remotehost));
 
-        if ($views['count'] == 0) {
+        if (empty($views) || $views['count'] == 0) {
             // No pages found.
             $mform->addElement('static', '', '', get_string('noviewscreated', 'assignsubmission_mahara'));
         } else {
