@@ -138,23 +138,15 @@ class assign_submission_mahara extends assign_submission_plugin {
     public function get_form_elements_for_user($submission, MoodleQuickForm $mform, stdClass $data, $userid) {
         global $DB;
 
-        $submissionid = $submission ? $submission->id : 0;
-        $maharasubmission = $this->get_mahara_submission($submissionid);
+        // Getting submission.
+        if ($submission) {
+            $maharasubmission = $this->get_mahara_submission($submission->id);
+        }
         // Getting views (pages) user have in linked site.
         $views = $this->mnet_get_views();
+        $viewids = $views['ids'];
 
-        // See if any of views are already in use, we will remove them from select.
-        $sql = "
-             SELECT viewid, submission
-             FROM
-                 {assignsubmission_mahara}
-             WHERE
-                 viewid IN (" . implode(',', $views['ids']) . ")";
-        $viewsinuse = $DB->get_records_sql($sql);
-        if ($maharasubmission) {
-            unset($viewsinuse[$maharasubmission->viewid]);
-        }
-
+        // Prepare the header.
         $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
         $url = new moodle_url('/auth/mnet/jump.php', array('hostid' => $remotehost->id));
         $remotehost->jumpurl = $url->out();
@@ -162,22 +154,37 @@ class assign_submission_mahara extends assign_submission_plugin {
         $mform->getElement('header_mahara')->_text = $remotehost->name;
         $mform->addElement('static', '', '', get_string('selectmaharaview', 'assignsubmission_mahara', $remotehost));
 
-        if (empty($views) || $views['count'] == 0) {
-            // No pages found.
-            $mform->addElement('static', '', '', get_string('noviewscreated', 'assignsubmission_mahara'));
-        } else {
-            // Build select element containing user pages
-            $selectitems = array();
-            foreach ($views['data'] as $view) {
-                if (!array_key_exists($view['id'], $viewsinuse)) {
-                    $selectitems[$view['id']] = $view['title'];
-                }
+        // See if any of views are already in use, we will remove them from select.
+        if (count($viewids)) {
+            $sql = "
+                 SELECT viewid, submission
+                 FROM
+                     {assignsubmission_mahara}
+                 WHERE
+                     viewid IN (" . implode(',', $viewids) . ")";
+            $viewsinuse = $DB->get_records_sql($sql);
+            if (!empty($maharasubmission)) {
+                unset($viewsinuse[$maharasubmission->viewid]);
             }
-            $mform->addElement('select', 'viewid', '', $selectitems);
-            if ($maharasubmission) {
-                $mform->setDefault('viewid', $maharasubmission->viewid);
+            $viewstoshow = array_diff($viewids, array_keys($viewsinuse));
+
+            // Build select element containing user pages.
+            if (count($viewstoshow)) {
+                $viewsindex = array_flip($viewids);
+                $selectitems = array();
+                foreach ($viewstoshow as $viewid) {
+                    $selectitems[$viewid] = $views['data'][$viewsindex[$viewid]]['title'];
+                }
+                $mform->addElement('select', 'viewid', '', $selectitems);
+                if (!empty($maharasubmission)) {
+                    $mform->setDefault('viewid', $maharasubmission->viewid);
+                }
+                return true;
             }
         }
+
+        // No pages found.
+        $mform->addElement('static', '', '', get_string('noviewscreated', 'assignsubmission_mahara'));
         return true;
     }
 
