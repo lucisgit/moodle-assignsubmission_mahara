@@ -335,6 +335,21 @@ class assign_submission_mahara extends assign_submission_plugin {
         }
     }
 
+    /**
+     * Check if the submission plugin has all the required data to allow the work
+     * to be submitted for grading
+     * @param stdClass $submission the assign_submission record being submitted.
+     * @return bool|string 'true' if OK to proceed with submission, otherwise a
+     *                        a message to display to the user
+     */
+    public function precheck_submission($submission) {
+        $maharasubmission = $this->get_mahara_submission($submission->id);
+        if (!$maharasubmission) {
+            return get_string('emptysubmission', 'assignsubmission_mahara');
+        }
+        return true;
+    }
+
      /**
       * Process submission for grading
       *
