@@ -195,7 +195,7 @@ class assign_submission_mahara extends assign_submission_plugin {
      * @param string $query Search query
      * @return mixed
      */
-    function mnet_get_views($query = '') {
+    public function mnet_get_views($query = '') {
         global $USER;
         return $this->mnet_send_request('get_views_for_user', array($USER->username, $query));
     }
@@ -207,7 +207,7 @@ class assign_submission_mahara extends assign_submission_plugin {
      * @param int $viewid View ID
      * @return mixed
      */
-    function mnet_submit_view($viewid) {
+    public function mnet_submit_view($viewid) {
         global $USER;
         return $this->mnet_send_request('submit_view_for_assessment', array($USER->username, $viewid));
     }
@@ -220,7 +220,7 @@ class assign_submission_mahara extends assign_submission_plugin {
      * @param array $viewoutcomes Outcomes data
      * @return mixed
      */
-    function mnet_release_submited_view($viewid, $viewoutcomes) {
+    public function mnet_release_submited_view($viewid, $viewoutcomes) {
         global $USER;
         return $this->mnet_send_request('release_submitted_view', array($viewid, $viewoutcomes, $USER->username));
     }
@@ -282,7 +282,7 @@ class assign_submission_mahara extends assign_submission_plugin {
         global $DB;
 
         $maharasubmission = $this->get_mahara_submission($submission->id);
-        if ($submission->status === 'draft') {
+        if ($submission->status === ASSIGN_SUBMISSION_STATUS_DRAFT) {
             // Draft. All we need to do is just save or update submitted view data.
             if (!$views = $this->mnet_get_views()) {
                 // Wrap recorded error in language string and return false.
@@ -364,7 +364,7 @@ class assign_submission_mahara extends assign_submission_plugin {
       * @param stdClass $submission
       * @return void
       */
-    function submit_for_grading(stdClass $submission) {
+    public function submit_for_grading($submission) {
         global $DB;
         $maharasubmission = $this->get_mahara_submission($submission->id);
         // Lock view on Mahara side as it has been submitted for assessment.
@@ -383,7 +383,7 @@ class assign_submission_mahara extends assign_submission_plugin {
       * @param stdClass $submission
       * @return void
       */
-    function lock(stdClass $submission) {
+    public function lock(stdClass $submission) {
         global $DB;
         $maharasubmission = $this->get_mahara_submission($submission->id);
         // Lock view on Mahara side as it has been submitted for assessment.
@@ -402,9 +402,9 @@ class assign_submission_mahara extends assign_submission_plugin {
       * @param stdClass $submission
       * @return void
       */
-    function unlock(stdClass $submission) {
+    public function unlock(stdClass $submission) {
         global $DB;
-        if ($submission->status === 'draft') {
+        if ($submission->status === ASSIGN_SUBMISSION_STATUS_DRAFT) {
             $maharasubmission = $this->get_mahara_submission($submission->id);
             // Unlock view on Mahara side as it has been unlocked.
             if ($this->mnet_release_submited_view($maharasubmission->viewid, array()) === false) {
@@ -422,7 +422,7 @@ class assign_submission_mahara extends assign_submission_plugin {
       * @param stdClass $submission
       * @return void
       */
-    function revert_to_draft(stdClass $submission) {
+    public function revert_to_draft(stdClass $submission) {
         global $DB;
         $maharasubmission = $this->get_mahara_submission($submission->id);
         // Unlock view on Mahara side as it has been reverted to draft.
