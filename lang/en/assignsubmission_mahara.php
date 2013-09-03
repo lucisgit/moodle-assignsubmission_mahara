@@ -36,4 +36,5 @@ $string['selectmaharaview'] = 'Select one of your "{$a->name}" portfolio pages f
 $string['site'] = 'Site';
 $string['site_help'] = 'This setting lets you select which Mahara site your students should submit their pages from.';
 $string['outputforlog'] = '{$a->remotehostname}: {$a->viewtitle} (view id: {$a->viewid})';
+$string['outputforlognew'] = 'New {$a} submission.';
 $string['viewsaved'] = '<a href="{$a->jumpurl}">Click here</a> to view "{$a->viewtitle}" page in "{$a->name}" portfolio.';

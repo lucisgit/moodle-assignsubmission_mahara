@@ -572,11 +572,14 @@ class assign_submission_mahara extends assign_submission_plugin {
      */
     public function format_for_log(stdClass $submission) {
         global $DB;
-        // Format the info for each submission plugin add_to_log
-        $maharasubmission = $this->get_mahara_submission($submission->id);
         $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
-        $maharasubmission->remotehostname = $remotehost->name;
-        return get_string('outputforlog', 'assignsubmission_mahara', $maharasubmission);
+        if ($maharasubmission = $this->get_mahara_submission($submission->id)) {
+            $maharasubmission->remotehostname = $remotehost->name;
+            $output = get_string('outputforlog', 'assignsubmission_mahara', $maharasubmission);
+        } else {
+            $output = get_string('outputforlognew', 'assignsubmission_mahara', $remotehost->name);
+        }
+        return $output;
     }
 
     /**
