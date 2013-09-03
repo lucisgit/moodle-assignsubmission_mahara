@@ -105,7 +105,7 @@ class assign_submission_mahara extends assign_submission_plugin {
             }
             $mform->addElement('select', 'assignsubmission_mahara_mnethostid', get_string('site', 'assignsubmission_mahara'), $hosts);
             $mform->setDefault('assignsubmission_mahara_mnethostid', $defaultmnethostid);
-            $mform->disabledIf('assignsubmission_mahara_mnethostid', 'assignsubmission_mahara_enabled', 'eq', 0);
+            $mform->disabledIf('assignsubmission_mahara_mnethostid', 'assignsubmission_mahara_enabled', 'notchecked');
         } else {
             // No hosts found.
             $mform->addElement('static', 'assignsubmission_mahara_mnethostid', get_string('site', 'assignsubmission_mahara'), get_string('nomaharahostsfound', 'assignsubmission_mahara'));
