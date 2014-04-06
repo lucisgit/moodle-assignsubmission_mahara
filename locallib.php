@@ -229,9 +229,15 @@ class assign_submission_mahara extends assign_submission_plugin {
      * @param int $viewid View ID
      * @return mixed
      */
-    public function mnet_submit_view($viewid, $iscollection) {
-        global $USER;
-        return $this->mnet_send_request('submit_view_for_assessment', array($USER->username, $viewid, $iscollection));
+    public function mnet_submit_view($viewid, $iscollection, $viewownermoodleid = null) {
+        global $USER, $DB;
+        if (!$viewownermoodleid) {
+            $username = $USER->username;
+        }
+        else {
+            $username = $DB->get_field('user', 'username', array('id'=>$viewownermoodleid));
+        }
+        return $this->mnet_send_request('submit_view_for_assessment', array($username, $viewid, $iscollection));
     }
 
     /**
@@ -454,7 +460,7 @@ class assign_submission_mahara extends assign_submission_plugin {
 
         $maharasubmission = $this->get_mahara_submission($submission->id);
         // Lock view on Mahara side as it has been submitted for assessment.
-        if (!$response = $this->mnet_submit_view($maharasubmission->viewid, $maharasubmission->iscollection)) {
+        if (!$response = $this->mnet_submit_view($maharasubmission->viewid, $maharasubmission->iscollection, $submission->userid)) {
             throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
         }
         $maharasubmission->viewurl = $response['url'];
