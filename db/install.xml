@@ -12,7 +12,8 @@
         <FIELD NAME="viewid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of Mahara view" PREVIOUS="submission" NEXT="viewurl"/>
         <FIELD NAME="viewurl" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="URL of Mahara view" PREVIOUS="viewid" NEXT="viewtitle"/>
         <FIELD NAME="viewtitle" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Title of Mahara view" PREVIOUS="viewurl" NEXT="viewaccesskey"/>
-        <FIELD NAME="viewaccesskey" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Accesscode of Mahara view" PREVIOUS="viewtitle"/>
+        <FIELD NAME="viewaccesskey" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Accesscode of Mahara view" PREVIOUS="viewtitle" NEXT="iscollection"/>
+        <FIELD NAME="iscollection" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" DEFAULT="0" PREVIOUS="viewaccesskey" />
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="The unique id for this onlinetext submission." NEXT="assignment"/>

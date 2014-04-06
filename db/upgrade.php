@@ -28,8 +28,24 @@
  * @return bool
  */
 function xmldb_assignsubmission_mahara_upgrade($oldversion) {
-    // Moodle v2.3.0 release upgrade line.
-    // Put any upgrade step following this.
+    global $CFG, $DB, $OUTPUT;
+
+    $dbman = $DB->get_manager();
+
+    if ($oldversion < 2013062401) {
+
+        // Define field iscollection to be added to assignsubmission_mahara.
+        $table = new xmldb_table('assignsubmission_mahara');
+        $field = new xmldb_field('iscollection', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'viewaccesskey');
+
+        // Conditionally launch add field iscollection.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Mahara savepoint reached.
+        upgrade_plugin_savepoint(true, 2013062401, 'assignsubmission', 'mahara');
+    }
 
     return true;
 }
