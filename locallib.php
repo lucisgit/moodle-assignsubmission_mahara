@@ -420,6 +420,13 @@ class assign_submission_mahara extends assign_submission_plugin {
       */
     public function submit_for_grading($submission) {
         global $DB;
+
+        // If the submission has been locked in the gradebook, then it has already been submitted on the Mahara side
+        $flags = $this->assignment->get_user_flags($submission->userid, false);
+        if ($flags->locked == 1) {
+            return;
+        }
+
         $maharasubmission = $this->get_mahara_submission($submission->id);
         // Lock view on Mahara side as it has been submitted for assessment.
         if (!$response = $this->mnet_submit_view($maharasubmission->viewid, $maharasubmission->iscollection)) {
@@ -440,12 +447,10 @@ class assign_submission_mahara extends assign_submission_plugin {
     public function lock(stdClass $submission) {
         global $DB;
 
-        // TODO: The function mnet_submit_view() *already* locks the assignment. Calling it again will just cause errors
-        // What we would need to do, for delayed locking to work, is to separate out these components:
-        // 1. Creating a secret URL
-        // 2. Locking the submission on the Mahara side
-        // Either that, or make it so the teacher can't actually view the submission until it is locked.
-        return true;
+        // If it's in submitted status, then it has already been locked
+        if ($submission->status === ASSIGN_SUBMISSION_STATUS_SUBMITTED) {
+            return;
+        }
 
         $maharasubmission = $this->get_mahara_submission($submission->id);
         // Lock view on Mahara side as it has been submitted for assessment.
@@ -466,15 +471,19 @@ class assign_submission_mahara extends assign_submission_plugin {
       */
     public function unlock(stdClass $submission) {
         global $DB;
-        if ($submission->status === ASSIGN_SUBMISSION_STATUS_DRAFT) {
-            $maharasubmission = $this->get_mahara_submission($submission->id);
-            // Unlock view on Mahara side as it has been unlocked.
-            if ($this->mnet_release_submited_view($maharasubmission->viewid, array(), $maharasubmission->iscollection) === false) {
-                throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
-            }
-            $maharasubmission->viewaccesskey = '';
-            $DB->update_record('assignsubmission_mahara', $maharasubmission);
+
+        // If it has been submitted, it needs to remain locked
+        if ($submission->status === ASSIGN_SUBMISSION_STATUS_SUBMITTED) {
+            return;
         }
+
+        $maharasubmission = $this->get_mahara_submission($submission->id);
+        // Unlock view on Mahara side as it has been unlocked.
+        if ($this->mnet_release_submited_view($maharasubmission->viewid, array(), $maharasubmission->iscollection) === false) {
+            throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
+        }
+        $maharasubmission->viewaccesskey = '';
+        $DB->update_record('assignsubmission_mahara', $maharasubmission);
     }
 
     /**
@@ -486,6 +495,13 @@ class assign_submission_mahara extends assign_submission_plugin {
       */
     public function revert_to_draft(stdClass $submission) {
         global $DB;
+
+        // If the submission has been locked in the gradebook, then we don't want to release it on the Mahara side
+        $flags = $this->assignment->get_user_flags($submission->userid, false);
+        if ($flags->locked == 1) {
+            return;
+        }
+
         $maharasubmission = $this->get_mahara_submission($submission->id);
         // Unlock view on Mahara side as it has been reverted to draft.
         if ($this->mnet_release_submited_view($maharasubmission->viewid, array(), $maharasubmission->iscollection) === false) {
