@@ -13,6 +13,7 @@ The plugin has funtionality of old Mahara submission type plugin
 * graded page will never become editable again,
 * the same page cannot be submitted more than once,
 * the page used in the draft submission is not locked for editing in Mahara, but not avialable for being used in different submission.
+* collections can be submitted instead of only individual pages
 
 The plugin also allows exporting old Mahara submission assignments to the assignments of new type. The plugin does not include featues to communicate with outcomes artefact plugin.
 
@@ -32,7 +33,9 @@ Installation
 1. Make sure that your Moodle version is up-to-date (recent update included
    assign mod chnages required for this plugin).
 2. Copy the content to mod/assign/submission/mahara
-3. Proceed with installation in Moodle.
-4. In Site Admin > Networking > Peers choose the Mahara one, open Services
+3. Apply the patch "moodle-patch.txt" to your Moodle site.
+4. Apply the patch "mahara-patch.txt" to your Mahara site.
+5. Proceed with installation in Moodle.
+6. In Site Admin > Networking > Peers choose the Mahara one, open Services
       tab and enable Assign Submission Mahara services.
-5. Now you may create your first Mahara assignment.
+7. Now you may create your first Mahara assignment.
