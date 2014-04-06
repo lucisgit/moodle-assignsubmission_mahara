@@ -39,3 +39,15 @@ Installation
 6. In Site Admin > Networking > Peers choose the Mahara one, open Services
       tab and enable Assign Submission Mahara services.
 7. Now you may create your first Mahara assignment.
+
+About those patches
+-------------------
+
+As you may have noticed in the installation instructions, this plugin requires you to apply a patch to your Moodle site and another patch to your Mahara site. The Moodle patch provides an additional hook for the assignment submission plugin to respond when an assignment is reopened. The Mahara patch provides support for the Mahara web services to handle collections.
+
+Both of these patches have been submitted for inclusion in Moodle core & Mahara core, so it is possible that by the time you're reading this, they will already have been merged and you will not need to patch manually:
+
+ - Moodle: https://tracker.moodle.org/browse/MDL-44971
+ - Mahara: https://reviews.mahara.org/3200
+
+For information about how to apply a patch file, try Google.
