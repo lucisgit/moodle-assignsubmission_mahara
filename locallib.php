@@ -171,7 +171,7 @@ class assign_submission_mahara extends assign_submission_plugin {
         $mform->addElement('static', '', '', get_string('selectmaharaview', 'assignsubmission_mahara', $remotehost));
 
         // See if any of views are already in use, we will remove them from select.
-        if (count($viewids) || count($views['collections']['count'])) {
+        if (count($viewids) || count($views['collections']['data'])) {
             $viewoptions = array();
             foreach ($views['data'] as $view) {
                 $viewoptions['v' . $view['id']] = $view['title'];
