@@ -711,4 +711,24 @@ class assign_submission_mahara extends assign_submission_plugin {
 
         return true;
     }
+
+    /**
+     * Carry out any extra processing required when a student is given a new attempt
+     * (i.e. when the submission is "reopened"
+     * @param stdClass $oldsubmission The previous attempt
+     * @param stdClass $newsubmission The new attempt
+     */
+    public function add_attempt(stdClass $oldsubmission, stdClass $newsubmission) {
+        global $DB;
+        // Unlock the previous submission's page if the assignment is reopened. That way
+        // the student can make improvements and then resubmit.
+        $maharasubmission = $this->get_mahara_submission($oldsubmission->id);
+        if ($maharasubmission) {
+            if ($this->mnet_release_submited_view($maharasubmission->viewid, array(), $maharasubmission->iscollection) === false) {
+                throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
+            }
+            $maharasubmission->viewaccesskey = '';
+            $DB->update_record('assignsubmission_mahara', $maharasubmission);
+        }
+    }
 }
