@@ -32,6 +32,8 @@ $string['mahara'] = 'Mahara portfolio';
 $string['needstobelocked'] = 'Draft submission either needs to be submitted for assessment by user or locked before view link will be available.';
 $string['nomaharahostsfound'] = 'No mahara hosts found.';
 $string['noviewscreated'] = 'No pages found.';
+$string['option_collections'] = 'Collections';
+$string['option_views'] = 'Views';
 $string['pluginname'] = 'Mahara portfolio';
 $string['selectmaharaview'] = 'Select one of your "{$a->name}" portfolio pages from this complete list, or <a href="{$a->jumpurl}">click here</a> to visit "{$a->name}" and create a page.';
 $string['site'] = 'Site';

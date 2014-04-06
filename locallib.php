@@ -181,9 +181,8 @@ class assign_submission_mahara extends assign_submission_plugin {
                 $colloptions['c' . $coll['id']] = $coll['name'];
             }
 
-            // TODO: lang strings
-            $viewstr = 'Views';
-            $collstr = 'Collections';
+            $viewstr = get_string('option_views', 'assignsubmission_mahara');
+            $collstr = get_string('option_collections', 'assignsubmission_mahara');
             $options = array();
 
             if ($viewoptions) {
