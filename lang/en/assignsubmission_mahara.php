@@ -35,6 +35,7 @@ $string['noviewscreated'] = 'No pages found.';
 $string['option_collections'] = 'Collections';
 $string['option_views'] = 'Views';
 $string['pluginname'] = 'Mahara portfolio';
+$string['previousattemptsnotvisible'] = 'Previous attempts with the Mahara submission plugin are not visible.';
 $string['selectmaharaview'] = 'Select one of your "{$a->name}" portfolio pages from this complete list, or <a href="{$a->jumpurl}">click here</a> to visit "{$a->name}" and create a page.';
 $string['site'] = 'Site';
 $string['site_help'] = 'This setting lets you select which Mahara site your students should submit their pages from.';

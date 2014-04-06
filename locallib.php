@@ -592,14 +592,18 @@ class assign_submission_mahara extends assign_submission_plugin {
         $result = '';
         $maharasubmission = $this->get_mahara_submission($submission->id);
         if ($maharasubmission) {
-            if ($submission->userid == $USER->id || !empty($maharasubmission->viewaccesskey)) {
+            $lastattempt = $DB->get_field('assign_submission', 'max(attemptnumber)', array('assignment' => $submission->assignment, 'groupid' => $submission->groupid, 'userid'=>$submission->userid));
+            if ($submission->attemptnumber < $lastattempt) {
+                // TODO: lang string
+                $result .= get_string('previousattemptsnotvisible', 'assignsubmission_mahara');
+            } else if ($submission->userid == $USER->id || !empty($maharasubmission->viewaccesskey)) {
                 // Either the page is viewed by the author or access code has been issued
                 $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
                 $url = $this->get_view_url($maharasubmission);
                 $remotehost->jumpurl = $url->out();
                 $remotehost->viewtitle = $maharasubmission->viewtitle;
                 $result .= get_string('viewsaved', 'assignsubmission_mahara', $remotehost);
-            } elseif (empty($maharasubmission->viewaccesskey)) {
+            } else if (empty($maharasubmission->viewaccesskey)) {
                 $result .= get_string('needstobelocked', 'assignsubmission_mahara');
             }
         }
