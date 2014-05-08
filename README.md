@@ -48,6 +48,6 @@ As you may have noticed in the installation instructions, this plugin requires y
 Both of these patches have been submitted for inclusion in Moodle core & Mahara core, so it is possible that by the time you're reading this, they will already have been merged and you will not need to patch manually:
 
  - Moodle: https://tracker.moodle.org/browse/MDL-44971
- - Mahara: https://reviews.mahara.org/3200
+ - Mahara: https://reviews.mahara.org/#/c/3239/
 
 For information about how to apply a patch file, try Google.
