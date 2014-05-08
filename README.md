@@ -33,7 +33,7 @@ Installation
 1. Make sure that your Moodle version is up-to-date (recent update included
    assign mod chnages required for this plugin).
 2. Copy the content to mod/assign/submission/mahara
-3. Apply the patch "moodle-patch.txt" to your Moodle site.
+3. If you are using Moodle 2.6 or earlier, apply the patch "moodle-patch.txt" to your Moodle site.
 4. Apply the patch "mahara-patch.txt" to your Mahara site.
 5. Proceed with installation in Moodle.
 6. In Site Admin > Networking > Peers choose the Mahara one, open Services
@@ -45,9 +45,6 @@ About those patches
 
 As you may have noticed in the installation instructions, this plugin requires you to apply a patch to your Moodle site and another patch to your Mahara site. The Moodle patch provides an additional hook for the assignment submission plugin to respond when an assignment is reopened. The Mahara patch provides support for the Mahara web services to handle collections.
 
-Both of these patches have been submitted for inclusion in Moodle core & Mahara core, so it is possible that by the time you're reading this, they will already have been merged and you will not need to patch manually:
-
- - Moodle: https://tracker.moodle.org/browse/MDL-44971
- - Mahara: https://reviews.mahara.org/#/c/3239/
+The Moodle patch has been upstreamed into Moodle 2.7, so if you are using that version or later, you do not need to manually apply the patch file. The Mahara patch is still in the process of code review as of May 2014 (see https://reviews.mahara.org/#/c/3239/ ), targetted for Mahara 1.10.
 
 For information about how to apply a patch file, try Google.
