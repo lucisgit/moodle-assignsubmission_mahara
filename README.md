@@ -73,7 +73,9 @@ The Moodle patch has been upstreamed into Moodle 2.7, so if you are using that v
 
 For information about how to apply a patch file, try Google. If you are using Linux, the process will look something like this:
 
- cd /var/www/path/to/mahara
- patch -p0 < /path/to/mahara-patch.txt
- cd /var/www/path/to/moodle
- patch -p0 < /path to/moodle-patch.txt
+```Shell
+cd /var/www/path/to/mahara
+patch -p0 < /path/to/mahara-patch.txt
+cd /var/www/path/to/moodle
+patch -p0 < /path to/moodle-patch.txt
+```
