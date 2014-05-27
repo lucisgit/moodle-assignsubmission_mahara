@@ -352,8 +352,11 @@ class assign_submission_mahara extends assign_submission_plugin {
             }
             if ($iscollection) {
                 $foundcoll = false;
-                foreach ($views['collections'] as $coll) {
-                    if ($coll['id'] == $data->$viewid) {
+                if (!is_array($views['collections']['data'])) {
+                    return false;
+                }
+                foreach ($views['collections']['data'] as $coll) {
+                    if ($coll['id'] == $data->viewid) {
                         $foundcoll = true;
                         $url = $coll['url'];
                         $title = clean_text($coll['name']);
