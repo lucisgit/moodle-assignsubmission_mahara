@@ -486,6 +486,12 @@ class assign_submission_mahara extends assign_submission_plugin {
         }
 
         $maharasubmission = $this->get_mahara_submission($submission->id);
+
+        // If no page is selected, then we don't need to do anything special here.
+        if (!$maharasubmission || !$maharasubmission->viewid) {
+            return;
+        }
+
         // Lock view on Mahara side as it has been submitted for assessment.
         if (!$response = $this->mnet_submit_view($submission, $maharasubmission->viewid, $maharasubmission->iscollection, $submission->userid)) {
             throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
@@ -511,6 +517,12 @@ class assign_submission_mahara extends assign_submission_plugin {
         }
 
         $maharasubmission = $this->get_mahara_submission($submission->id);
+
+        // If no page is selected, then we don't need to do anything special here.
+        if (!$maharasubmission || !$maharasubmission->viewid) {
+            return;
+        }
+
         // Unlock view on Mahara side as it has been unlocked.
         if ($this->mnet_release_submited_view($maharasubmission->viewid, array(), $maharasubmission->iscollection) === false) {
             throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
