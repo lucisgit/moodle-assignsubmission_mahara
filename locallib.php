@@ -459,7 +459,7 @@ class assign_submission_mahara extends assign_submission_plugin {
 
         // If the submission has been locked in the gradebook, then it has already been submitted on the Mahara side
         $flags = $this->assignment->get_user_flags($submission->userid, false);
-        if ($flags->locked == 1) {
+        if ($flags && $flags->locked == 1) {
             return;
         }
 
@@ -546,7 +546,7 @@ class assign_submission_mahara extends assign_submission_plugin {
 
         // If the submission has been locked in the gradebook, then we don't want to release it on the Mahara side
         $flags = $this->assignment->get_user_flags($submission->userid, false);
-        if ($flags->locked == 1) {
+        if ($flags && $flags->locked == 1) {
             return;
         }
 
