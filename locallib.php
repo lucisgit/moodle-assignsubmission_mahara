@@ -255,7 +255,7 @@ class assign_submission_mahara extends assign_submission_plugin {
                         )
                 )
         ) {
-            throw new moodle_exception('errorcantsubmit', 'assignsubmission_mahara');
+            throw new moodle_exception('vieworcollectionalreadysubmitted', 'assignsubmission_mahara');
         }
 
         if (!$viewownermoodleid) {
