@@ -155,7 +155,13 @@ class assign_submission_mahara extends assign_submission_plugin {
         }
         // Filter out submitted collections
         foreach ($views['collections']['data'] as $i => $coll) {
-            if ($coll['submittedtime']) {
+            if (
+                    $coll['submittedtime']
+                    || (
+                            array_key_exists('numviews', $coll)
+                            && $coll['numviews'] == 0
+                    )
+            ) {
                 unset($views['collections']['data'][$i]);
                 $views['collections']['count']--;
             }
