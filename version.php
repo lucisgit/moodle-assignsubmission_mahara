@@ -18,13 +18,13 @@
  * This file contains the version information for Mahara submission plugin
  *
  * @package    assignsubmission_mahara
- * @copyright  2012 Lancaster University
+ * @copyright  2014 Lancaster University (@link http://www.lancaster.ac.uk/)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2013062401;
-$plugin->requires  = 2012062500;
+$plugin->version   = 2014061700;
+$plugin->requires  = 2014050800;
 $plugin->component = 'assignsubmission_mahara';
-$plugin->release   = '0.7';
+$plugin->release   = '0.8';
