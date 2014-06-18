@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'assignsubmission_onlinetext', language 'en'
+ * Strings for component 'assignsubmission_mahara', language 'en'
  *
- * @package   assignsubmission_onlinetext
- * @copyright 2012 NetSpot {@link http://www.netspot.com.au}
+ * @package   assignsubmission_mahara
+ * @copyright 2014 Lancaster University (@link http://www.lancaster.ac.uk/)
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,6 +30,7 @@ $string['enabled'] = 'Mahara portfolio';
 $string['enabled_help'] = "If enabled, students are able to submit Mahara pages for assessment in Moodle. The Mahara site must already be configured for mnet networking with this Moodle site.";
 $string['emptysubmission'] = 'You have not chosen the page to submit.';
 $string['errormnetrequest'] = 'Attempt to send mnet request resulted in error: {$a}';
+$string['eventassessableuploaded'] = 'A Mahara page or collection has been submitted.';
 $string['vieworcollectionalreadysubmitted'] = 'The selected Mahara view or collection could not be submitted. Please choose another.';
 $string['mahara'] = 'Mahara portfolio';
 $string['needstobelocked'] = 'Draft submission either needs to be submitted for assessment by user or locked before view link will be available.';

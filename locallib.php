@@ -20,7 +20,7 @@
  * This class provides all the functionality for the new assign module.
  *
  * @package    assignsubmission_mahara
- * @copyright  2012 Lancaster University
+ * @copyright  2014 Lancaster University (@link http://www.lancaster.ac.uk/)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * library class for Mahara submission plugin extending submission plugin base class
  *
  * @package    assignsubmission_mahara
- * @copyright  2012 Lancaster University
+ * @copyright  2014 Lancaster University (@link http://www.lancaster.ac.uk/)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class assign_submission_mahara extends assign_submission_plugin {
@@ -336,7 +336,7 @@ class assign_submission_mahara extends assign_submission_plugin {
       * @return bool
       */
      public function save(stdClass $submission, stdClass $data) {
-        global $DB;
+        global $USER, $DB;
 
         // Because the drop-down menu contains collections & views, we make the id
         // start with "v" or "c" to indicate the type, e.g. v30, c100
@@ -403,6 +403,42 @@ class assign_submission_mahara extends assign_submission_plugin {
                 throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
             }
 
+            $params = array(
+                'context' => context_module::instance($this->assignment->get_course_module()->id),
+                'courseid' => $this->assignment->get_course()->id,
+                'objectid' => $submission->id,
+                'other' => array(
+                    'pathnamehashes' => array(),
+                    'content' => ''
+                )
+            );
+            if (!empty($submission->userid) && ($submission->userid != $USER->id)) {
+                $params['relateduserid'] = $submission->userid;
+            }
+            $event = \assignsubmission_mahara\event\assessable_uploaded::create($params);
+            $event->trigger();
+
+            $groupname = null;
+            $groupid = 0;
+            // Get the group name as other fields are not transcribed in the logs and this information is important.
+            if (empty($submission->userid) && !empty($submission->groupid)) {
+                $groupname = $DB->get_field('groups', 'name', array('id' => $submission->groupid), '*', MUST_EXIST);
+                $groupid = $submission->groupid;
+            } else {
+                $params['relateduserid'] = $submission->userid;
+            }
+
+            // Unset the objectid and other field from params for use in submission events.
+            unset($params['objectid']);
+            unset($params['other']);
+            $params['other'] = array(
+                'submissionid' => $submission->id,
+                'submissionattempt' => $submission->attemptnumber,
+                'submissionstatus' => $submission->status,
+                'groupid' => $groupid,
+                'groupname' => $groupname
+            );
+
             if ($maharasubmission) {
                 // If we are updating previous submission, release previous submission first.
                 if ($maharasubmission->viewid != $data->viewid) {
@@ -416,7 +452,12 @@ class assign_submission_mahara extends assign_submission_plugin {
                 $maharasubmission->viewtitle = clean_text($response['title']);
                 $maharasubmission->viewaccesskey = $response['accesskey'];
                 $maharasubmission->iscollection = (int) $iscollection;
-                return $DB->update_record('assignsubmission_mahara', $maharasubmission);
+                $params['objectid'] = $maharasubmission->id;
+                $updatestatus = $DB->update_record('assignsubmission_mahara', $maharasubmission);
+                $event = \assignsubmission_mahara\event\submission_updated::create($params);
+                $event->set_assign($this->assignment);
+                $event->trigger();
+                return $updatestatus;
             } else {
                 // We are dealing with the new submission.
                 $maharasubmission = new stdClass();
@@ -428,7 +469,12 @@ class assign_submission_mahara extends assign_submission_plugin {
 
                 $maharasubmission->submission = $submission->id;
                 $maharasubmission->assignment = $this->assignment->get_instance()->id;
-                return $DB->insert_record('assignsubmission_mahara', $maharasubmission) > 0;
+                $maharasubmission->id = $DB->insert_record('assignsubmission_mahara', $maharasubmission);
+                $params['objectid'] = $maharasubmission->id;
+                $event = \assignsubmission_mahara\event\submission_created::create($params);
+                $event->set_assign($this->assignment);
+                $event->trigger();
+                return $maharasubmission->id > 0;
             }
         }
     }
