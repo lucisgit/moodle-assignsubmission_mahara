@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'assignsubmission_onlinetext', language 'en'
+ * Strings for component 'assignsubmission_mahara', language 'en'
  *
- * @package   assignsubmission_onlinetext
- * @copyright 2012 NetSpot {@link http://www.netspot.com.au}
+ * @package   assignsubmission_mahara
+ * @copyright 2014 Lancaster University (@link http://www.lancaster.ac.uk/)
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -38,6 +38,7 @@ $string['errormnetrequest'] = 'Attempt to send mnet request resulted in error: {
 $string['errorinvalidhost'] = 'Invalid host id selected';
 $string['errorinvalidstatus'] = 'Developer Error: Invalid submission status sent to assign_submission_mahara::set_mahara_submission_status()';
 $string['errorvieworcollectionalreadysubmitted'] = 'The selected Mahara view or collection could not be submitted. Please choose another.';
+$string['eventassessableuploaded'] = 'A Mahara page or collection has been submitted.';
 $string['lockpages'] = 'Lock submitted pages';
 $string['lockpages_help'] = 'If set, submitted Mahara pages and collections will be locked from editing in Mahara. (If you are also using the Mahara feedback plugin, they will be unlocked once the submission is graded.)';
 $string['mahara'] = 'Mahara portfolio';
