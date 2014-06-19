@@ -145,25 +145,27 @@ class assign_submission_mahara extends assign_submission_plugin {
         // Getting views (pages) user have in linked site.
         $views = $this->mnet_get_views();
 
-        // Filter out collection views, special views, and already-submitted views
-        foreach ($views['data'] as $i => $view) {
-            if ($view['collid'] || $view['submittedtime'] || $view['type'] != 'portfolio') {
-                unset($views['ids'][$i]);
-                unset($views['data'][$i]);
-                $views['count']--;
+        if ($views) {
+            // Filter out collection views, special views, and already-submitted views
+            foreach ($views['data'] as $i => $view) {
+                if ($view['collid'] || $view['submittedtime'] || $view['type'] != 'portfolio') {
+                    unset($views['ids'][$i]);
+                    unset($views['data'][$i]);
+                    $views['count']--;
+                }
             }
-        }
-        // Filter out submitted collections
-        foreach ($views['collections']['data'] as $i => $coll) {
-            if (
-                    $coll['submittedtime']
-                    || (
-                            array_key_exists('numviews', $coll)
-                            && $coll['numviews'] == 0
-                    )
-            ) {
-                unset($views['collections']['data'][$i]);
-                $views['collections']['count']--;
+            // Filter out submitted collections
+            foreach ($views['collections']['data'] as $i => $coll) {
+                if (
+                        $coll['submittedtime']
+                        || (
+                                array_key_exists('numviews', $coll)
+                                && $coll['numviews'] == 0
+                        )
+                ) {
+                    unset($views['collections']['data'][$i]);
+                    $views['collections']['count']--;
+                }
             }
         }
         $viewids = $views['ids'];
