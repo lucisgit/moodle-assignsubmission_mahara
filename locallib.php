@@ -172,9 +172,8 @@ class assign_submission_mahara extends assign_submission_plugin {
         $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
         $url = new moodle_url('/auth/mnet/jump.php', array('hostid' => $remotehost->id));
         $remotehost->jumpurl = $url->out();
-        // Updating section header and adding description line.
-        $mform->getElement('header_mahara')->_text = $remotehost->name;
-        $mform->addElement('static', '', '', get_string('selectmaharaview', 'assignsubmission_mahara', $remotehost));
+        // Add label and description line.
+        $mform->addElement('static', 'description', $remotehost->name, get_string('selectmaharaview', 'assignsubmission_mahara', $remotehost));
 
         // See if any of views are already in use, we will remove them from select.
         if (count($viewids) || count($views['collections']['data'])) {
