@@ -194,10 +194,12 @@ class assign_submission_mahara extends assign_submission_plugin {
                 $colloptions['c' . $coll['id']] = $coll['name'];
             }
 
+            $nosubstr = get_string('nosubmission', 'assignsubmission_mahara');
             $viewstr = get_string('option_views', 'assignsubmission_mahara');
             $collstr = get_string('option_collections', 'assignsubmission_mahara');
             $options = array();
 
+            $options[$nosubstr] = array(0 => get_string('nothingselected', 'assignsubmission_mahara'));
             if ($viewoptions) {
                 $options[$viewstr] = $viewoptions;
             }
@@ -219,6 +221,8 @@ class assign_submission_mahara extends assign_submission_plugin {
 
         // No pages found.
         $mform->addElement('static', '', '', get_string('noviewscreated', 'assignsubmission_mahara'));
+        $mform->addElement('hidden', 'viewid', 0);
+        $mform->settype('viewid', PARAM_INT);
         return true;
     }
 
@@ -405,7 +409,7 @@ class assign_submission_mahara extends assign_submission_plugin {
         } else {
             // This is not the draft, but the actual submission. Process it properly.
             // Lock submission on mahara side.
-            if (!$response = $this->mnet_submit_view($submission, $data->viewid, $iscollection)) {
+            if ($data->viewid != 0 && !$response = $this->mnet_submit_view($submission, $data->viewid, $iscollection)) {
                 throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
             }
 
@@ -447,16 +451,16 @@ class assign_submission_mahara extends assign_submission_plugin {
 
             if ($maharasubmission) {
                 // If we are updating previous submission, release previous submission first.
-                if ($maharasubmission->viewid != $data->viewid) {
+                if ($maharasubmission->viewid != $data->viewid && $maharasubmission->viewid != 0) {
                     if ($this->mnet_release_submited_view($maharasubmission->viewid, array(), $maharasubmission->iscollection) === false) {
                         throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
                     }
                 }
                 // Update submission data.
                 $maharasubmission->viewid = $data->viewid;
-                $maharasubmission->viewurl = $response['url'];
-                $maharasubmission->viewtitle = clean_text($response['title']);
-                $maharasubmission->viewaccesskey = $response['accesskey'];
+                $maharasubmission->viewurl = isset($response) ? $response['url'] : '';
+                $maharasubmission->viewtitle = isset($response) ? clean_text($response['title']) : '';
+                $maharasubmission->viewaccesskey = isset($response) ? $response['accesskey'] : '';
                 $maharasubmission->iscollection = (int) $iscollection;
                 $params['objectid'] = $maharasubmission->id;
                 $updatestatus = $DB->update_record('assignsubmission_mahara', $maharasubmission);
@@ -468,9 +472,9 @@ class assign_submission_mahara extends assign_submission_plugin {
                 // We are dealing with the new submission.
                 $maharasubmission = new stdClass();
                 $maharasubmission->viewid = $data->viewid;
-                $maharasubmission->viewurl = $response['url'];
-                $maharasubmission->viewtitle = clean_text($response['title']);
-                $maharasubmission->viewaccesskey = $response['accesskey'];
+                $maharasubmission->viewurl = isset($response) ? $response['url'] : '';
+                $maharasubmission->viewtitle = isset($response) ? clean_text($response['title']) : '';
+                $maharasubmission->viewaccesskey = isset($response) ? $response['accesskey'] : '';
                 $maharasubmission->iscollection = (int) $iscollection;
 
                 $maharasubmission->submission = $submission->id;
@@ -518,11 +522,11 @@ class assign_submission_mahara extends assign_submission_plugin {
 
         $maharasubmission = $this->get_mahara_submission($submission->id);
         // Lock view on Mahara side as it has been submitted for assessment.
-        if (!$response = $this->mnet_submit_view($submission, $maharasubmission->viewid, $maharasubmission->iscollection)) {
+        if ($maharasubmission->viewid != 0 && !$response = $this->mnet_submit_view($submission, $maharasubmission->viewid, $maharasubmission->iscollection)) {
             throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
         }
-        $maharasubmission->viewurl = $response['url'];
-        $maharasubmission->viewaccesskey = $response['accesskey'];
+        $maharasubmission->viewurl = isset($response) ? $response['url'] : '';
+        $maharasubmission->viewaccesskey = isset($response) ? $response['accesskey'] : '';
         $DB->update_record('assignsubmission_mahara', $maharasubmission);
     }
 
@@ -549,11 +553,11 @@ class assign_submission_mahara extends assign_submission_plugin {
         }
 
         // Lock view on Mahara side as it has been submitted for assessment.
-        if (!$response = $this->mnet_submit_view($submission, $maharasubmission->viewid, $maharasubmission->iscollection, $submission->userid)) {
+        if ($maharasubmission->viewid != 0 && !$response = $this->mnet_submit_view($submission, $maharasubmission->viewid, $maharasubmission->iscollection, $submission->userid)) {
             throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
         }
-        $maharasubmission->viewurl = $response['url'];
-        $maharasubmission->viewaccesskey = $response['accesskey'];
+        $maharasubmission->viewurl = isset($response) ? $response['url'] : '';
+        $maharasubmission->viewaccesskey = isset($response) ? $response['accesskey'] : '';
         $DB->update_record('assignsubmission_mahara', $maharasubmission);
     }
 
@@ -620,7 +624,7 @@ class assign_submission_mahara extends assign_submission_plugin {
      */
     public function is_empty(stdClass $submission) {
         $maharasubmission = $this->get_mahara_submission($submission->id);
-        return empty($maharasubmission);
+        return empty($maharasubmission->viewid);
     }
 
     /**
