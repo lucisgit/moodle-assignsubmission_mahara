@@ -140,25 +140,31 @@ class assign_submission_mahara extends assign_submission_plugin {
 
         // Getting submission.
         if ($submission) {
-            $maharasubmission = $this->get_mahara_submission($submission->id);
+            if ($maharasubmission = $this->get_mahara_submission($submission->id)) {
+                $submittedviewid = $maharasubmission->viewid;
+            } else {
+                $submittedviewid = 0;
+            }
         }
         // Getting views (pages) user have in linked site.
         $views = $this->mnet_get_views();
 
         if ($views) {
-            // Filter out collection views, special views, and already-submitted views
+            // Filter out collection views, special views, and views already submitted to other assignments.
             foreach ($views['data'] as $i => $view) {
-                if ($view['collid'] || $view['submittedtime'] || $view['type'] != 'portfolio') {
+                if ($view['collid'] || ($view['submittedtime'] && $view['id'] != $submittedviewid) || $view['type'] != 'portfolio') {
                     unset($views['ids'][$i]);
                     unset($views['data'][$i]);
                     $views['count']--;
                 }
             }
-            // Filter out submitted collections
+            // Filter out collections already submitted to other assignments.
             foreach ($views['collections']['data'] as $i => $coll) {
                 if (
-                        $coll['submittedtime']
-                        || (
+                        (
+                                $coll['submittedtime']
+                                && $coll['id'] != $submittedviewid
+                        ) || (
                                 array_key_exists('numviews', $coll)
                                 && $coll['numviews'] == 0
                         )
