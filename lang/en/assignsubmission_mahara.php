@@ -44,3 +44,5 @@ $string['site'] = 'Site';
 $string['site_help'] = 'This setting lets you select which Mahara site your students should submit their pages from.';
 $string['outputforlog'] = '{$a->remotehostname}: {$a->viewtitle} (view id: {$a->viewid})';
 $string['outputforlognew'] = 'New {$a} submission.';
+$string['viewsby'] = 'Pages by {$a}';
+$string['collectionsby'] = 'Collections by {$a}';

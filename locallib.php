@@ -128,7 +128,6 @@ class assign_submission_mahara extends assign_submission_plugin {
     /**
      * Add elements to user submission form
      *
-     * @global stdClass $DB
      * @param mixed $submission stdClass|null
      * @param MoodleQuickForm $mform
      * @param stdClass $data
@@ -136,8 +135,10 @@ class assign_submission_mahara extends assign_submission_plugin {
      * @return bool
      */
     public function get_form_elements_for_user($submission, MoodleQuickForm $mform, stdClass $data, $userid) {
-        global $DB;
+        global $DB, $PAGE;
 
+        $PAGE->requires->js('/mod/assign/submission/mahara/js/popup.js');
+        $PAGE->requires->js('/mod/assign/submission/mahara/js/filter.js');
         // Getting submission.
         if ($submission) {
             $maharasubmission = $this->get_mahara_submission($submission->id);
@@ -190,12 +191,16 @@ class assign_submission_mahara extends assign_submission_plugin {
         // See if any of views are already in use, we will remove them from select.
         if (count($viewids) || count($views['collections']['data'])) {
             $viewoptions = array();
+            $viewstoshow = array();
             foreach ($views['data'] as $view) {
                 $viewoptions['v' . $view['id']] = $view['title'];
+                $viewstoshow['v' . $view['id']] = $view;
             }
             $colloptions = array();
+            $collstoshow = array();
             foreach ($views['collections']['data'] as $coll) {
                 $colloptions['c' . $coll['id']] = $coll['name'];
+                $collstoshow['c' . $coll['id']] = $coll;
             }
 
             $viewstr = get_string('option_views', 'assignsubmission_mahara');
@@ -209,7 +214,7 @@ class assign_submission_mahara extends assign_submission_plugin {
                 $options[$collstr] = $colloptions;
             }
 
-            $mform->addElement('selectgroups', 'viewid', '', $options);
+                $mform->addElement('selectgroups', 'viewid', '', $options);
             if (!empty($maharasubmission)) {
                 if ($maharasubmission->iscollection) {
                     $prefix = 'c';
@@ -218,12 +223,34 @@ class assign_submission_mahara extends assign_submission_plugin {
                 }
                 $mform->setDefault('viewid', $prefix . $maharasubmission->viewid);
             }
+
+            $mform->addElement('text', 'search', get_string('search'));
+            $mform->setType('search', PARAM_RAW);
+            $mform->addElement('html', '<hr/><br/>');
+            $mform->addElement('static', 'view_by',
+                "<strong>$remotehost->name</strong>:",
+                get_string('viewsby', 'assignsubmission_mahara', $views['displayname'])
+            );
+            foreach ($viewstoshow as $view) {
+                $viewurl = $this->get_view_url($view['url']);
+
+                $anchor = $this->get_preview_url($view['title'], $viewurl, strip_tags($view['description']));
+
+                $mform->addElement('radio', 'view', '', $anchor, $view['id']);
+            }
+
             return true;
         }
+        else {
+            $mform->addElement(
+                    'static',
+                    'no_pages',
+                    "<strong>" . get_string('error') . "</strong>",
+                    get_string('noviewscreated', 'assignsubmission_mahara', $host->name)
+            );
+            return;
+        }
 
-        // No pages found.
-        $mform->addElement('static', '', '', get_string('noviewscreated', 'assignsubmission_mahara'));
-        return true;
     }
 
     /**
@@ -587,12 +614,12 @@ class assign_submission_mahara extends assign_submission_plugin {
      * @param stdClass $maharasubmission assignsubmission_mahara record
      * @return stdClass $url Moodle URL object
      */
-    public function get_view_url(stdClass $maharasubmission) {
+    public function get_view_url($viewurl) {
         global $DB;
         $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
         $url = new moodle_url('/auth/mnet/jump.php', array(
             'hostid' => $remotehost->id,
-            'wantsurl' => $maharasubmission->viewurl,
+            'wantsurl' => $viewurl,
         ));
         return $url;
     }
@@ -646,7 +673,7 @@ class assign_submission_mahara extends assign_submission_plugin {
             } else if ($submission->userid == $USER->id || !empty($maharasubmission->viewaccesskey)) {
                 // Either the page is viewed by the author or access code has been issued
                 $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
-                $url = $this->get_view_url($maharasubmission);
+                $url = $this->get_view_url($maharasubmission->viewurl);
                 return $this->get_preview_url($maharasubmission->viewtitle, $url);
             } else if (empty($maharasubmission->viewaccesskey)) {
                 $result .= get_string('needstobelocked', 'assignsubmission_mahara');
