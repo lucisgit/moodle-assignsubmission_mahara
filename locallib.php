@@ -586,35 +586,27 @@ class assign_submission_mahara extends assign_submission_plugin {
         return $url;
     }
 
-     /**
-      * Display onlinetext word count in the submission status table
-      *
-      * @global stdClass $DB
-      * @global stdClass $OUTPUT
-      * @global stdClass $USER
-      * @param stdClass $submission
-      * @param bool $showviewlink - If the summary has been truncated set this to true
-      * @return string
-      */
-    public function view_summary(stdClass $submission, & $showviewlink) {
-        global $OUTPUT, $DB, $USER;
+    /**
+     * Gets the preview (popup) and link out for the portfolio
+     *
+     * @param string $name
+     * @param string|moodle_url $url
+     * @param string $title (Optional)
+     * @return string
+     */
+    public function get_preview_url($name, $url, $title = null) {
+        global $OUTPUT;
 
-        $maharasubmission = $this->get_mahara_submission($submission->id);
-        // Instead of letting Moodle generate the the view link,
-        // we will substitute own preview link in the summary output.
-        $link = '';
-        if ($maharasubmission) {
-            if ($submission->userid == $USER->id || !empty($maharasubmission->viewaccesskey)) {
-                // Either the page is viewed by the author or access code has been issued
-                $icon = $OUTPUT->pix_icon('t/preview', get_string('view' . substr($this->get_subtype(), strlen('assign')), 'mod_assign'));
-                $link .= $OUTPUT->action_link($this->get_view_url($maharasubmission), $icon);
-                $link .= $OUTPUT->spacer(array('width'=>15));
-            } else {
-                $showviewlink = true;
-            }
-            $link .= $maharasubmission->viewtitle;
-        }
-        return $link;
+        $icon = $OUTPUT->pix_icon('t/preview', $name);
+        $params = array('target' => '_blank', 'title' => $title ?: $name);
+
+        $popup_icon = html_writer::link($url, $icon, $params + array(
+          'class' => 'portfolio popup',
+        ));
+
+        $link = html_writer::link($url, $name, $params);
+
+        return "$popup_icon $link";
     }
 
     /**
@@ -630,27 +622,37 @@ class assign_submission_mahara extends assign_submission_plugin {
      * @return string
      */
     public function view(stdClass $submission) {
-        global $DB, $USER;
+        global $PAGE, $OUTPUT, $DB, $USER;
+
+        $PAGE->requires->js('/mod/assign/submission/mahara/js/popup.js');
 
         $result = '';
         $maharasubmission = $this->get_mahara_submission($submission->id);
         if ($maharasubmission) {
             $lastattempt = $DB->get_field('assign_submission', 'max(attemptnumber)', array('assignment' => $submission->assignment, 'groupid' => $submission->groupid, 'userid'=>$submission->userid));
             if ($submission->attemptnumber < $lastattempt) {
-                // TODO: lang string
                 $result .= get_string('previousattemptsnotvisible', 'assignsubmission_mahara');
             } else if ($submission->userid == $USER->id || !empty($maharasubmission->viewaccesskey)) {
                 // Either the page is viewed by the author or access code has been issued
                 $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
                 $url = $this->get_view_url($maharasubmission);
-                $remotehost->jumpurl = $url->out();
-                $remotehost->viewtitle = $maharasubmission->viewtitle;
-                $result .= get_string('viewsaved', 'assignsubmission_mahara', $remotehost);
+                return $this->get_preview_url($maharasubmission->viewtitle, $url);
             } else if (empty($maharasubmission->viewaccesskey)) {
                 $result .= get_string('needstobelocked', 'assignsubmission_mahara');
             }
         }
         return $result;
+    }
+
+    /**
+     * @see parent
+     *
+     * @param stdClass $submission
+     * @param bool $showviewlink (Mutable)
+     * @return string
+     */
+    public function view_summary(stdClass $submission, &$showviewlink) {
+        return $this->view($submission);
     }
 
      /**
