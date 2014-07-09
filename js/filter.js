@@ -10,26 +10,33 @@
  */
 
 (function($) {
-  var $searchBox = $.querySelector('#id_search');
-  var $divs = $.querySelectorAll('div[id^=fitem_id_view_]');
+    var $searchBox = $.querySelector('#id_search');
+    var $divs = $.querySelectorAll('div[id^=fitem_id_view_]');
 
-  var toggleDiv = function(div, show) {
-    if (!show && !div.style.display) {
-      div.style.display = 'none';
-    } else if (show) {
-      div.style.display = '';
-    }
-  };
-
-  var filterByName = function(name) {
-    var reg = new RegExp(name, 'i');
-    for (var i = 0; i < $divs.length; i++) {
-      var $div = $divs.item(i);
-      toggleDiv($div, $div.innerText.match(reg));
+    var toggleDiv = function(div, show) {
+        if (!show && !div.style.display) {
+            div.style.display = 'none';
+        } else if (show) {
+            div.style.display = '';
+        }
     };
-  };
 
-  $searchBox.addEventListener('keyup', function(e) {
-    filterByName($searchBox.value);
-  });
+    var filterByName = function(name) {
+        var reg = new RegExp(name, 'i');
+        for ( var i = 0; i < $divs.length; i++) {
+            var $div = $divs.item(i);
+            var text;
+            if (typeof $div.innerText != 'undefined') {
+                text = $div.innerText;
+            } else {
+                text = $div.textContent;
+            }
+            toggleDiv($div, text.match(reg));
+        }
+        ;
+    };
+
+    $searchBox.addEventListener('keyup', function(e) {
+        filterByName($searchBox.value);
+    });
 })(document);
