@@ -35,6 +35,10 @@ defined('MOODLE_INTERNAL') || die();
  */
 class assign_submission_mahara extends assign_submission_plugin {
 
+    const STATUS_SELECTED = 'selected';
+    const STATUS_SUBMITTED = 'submitted';
+    const STATUS_RELEASED = 'released';
+
     /**
      * Get the name of the Mahara submission plugin
      *
@@ -190,31 +194,29 @@ class assign_submission_mahara extends assign_submission_plugin {
 
         // See if any of views are already in use, we will remove them from select.
         if (count($viewids) || count($views['collections']['data'])) {
-            $viewoptions = array();
-            $viewstoshow = array();
-            foreach ($views['data'] as $view) {
-                $viewoptions['v' . $view['id']] = $view['title'];
-                $viewstoshow['v' . $view['id']] = $view;
+            $mform->addElement('text', 'search', get_string('search'));
+            $mform->setType('search', PARAM_RAW);
+            $mform->addElement('html', '<hr/><br/>');
+            if (count($views['data'])) {
+                $mform->addElement('static', 'view_by',
+                    get_string('viewsby', 'assignsubmission_mahara', $views['displayname'])
+                );
+                foreach ($views['data'] as $view) {
+                    $viewurl = $this->get_view_url($view['url']);
+                    $anchor = $this->get_preview_url($view['title'], $viewurl, strip_tags($view['description']));
+                    $mform->addElement('radio', 'viewid', '', $anchor, 'v' . $view['id']);
+                }
             }
-            $colloptions = array();
-            $collstoshow = array();
-            foreach ($views['collections']['data'] as $coll) {
-                $colloptions['c' . $coll['id']] = $coll['name'];
-                $collstoshow['c' . $coll['id']] = $coll;
+            if (count($views['collections']['data'])) {
+                $mform->addElement('static', 'collection_by',
+                    get_string('collectionsby', 'assignsubmission_mahara', $views['displayname'])
+                );
+                foreach ($views['collections']['data'] as $coll) {
+                    $collurl = $this->get_view_url($coll['url']);
+                    $anchor = $this->get_preview_url($coll['name'], $collurl, strip_tags($coll['description']));
+                    $mform->addElement('radio', 'viewid', '', $anchor, 'c' . $coll['id']);
+                }
             }
-
-            $viewstr = get_string('option_views', 'assignsubmission_mahara');
-            $collstr = get_string('option_collections', 'assignsubmission_mahara');
-            $options = array();
-
-            if ($viewoptions) {
-                $options[$viewstr] = $viewoptions;
-            }
-            if ($colloptions) {
-                $options[$collstr] = $colloptions;
-            }
-
-                $mform->addElement('selectgroups', 'viewid', '', $options);
             if (!empty($maharasubmission)) {
                 if ($maharasubmission->iscollection) {
                     $prefix = 'c';
@@ -222,21 +224,6 @@ class assign_submission_mahara extends assign_submission_plugin {
                     $prefix = 'v';
                 }
                 $mform->setDefault('viewid', $prefix . $maharasubmission->viewid);
-            }
-
-            $mform->addElement('text', 'search', get_string('search'));
-            $mform->setType('search', PARAM_RAW);
-            $mform->addElement('html', '<hr/><br/>');
-            $mform->addElement('static', 'view_by',
-                "<strong>$remotehost->name</strong>:",
-                get_string('viewsby', 'assignsubmission_mahara', $views['displayname'])
-            );
-            foreach ($viewstoshow as $view) {
-                $viewurl = $this->get_view_url($view['url']);
-
-                $anchor = $this->get_preview_url($view['title'], $viewurl, strip_tags($view['description']));
-
-                $mform->addElement('radio', 'view', '', $anchor, $view['id']);
             }
 
             return true;
@@ -285,10 +272,11 @@ class assign_submission_mahara extends assign_submission_plugin {
         if (
                 $DB->record_exists_select(
                         'assignsubmission_mahara',
-                        'viewid = ? AND iscollection = ? AND viewaccesskey IS NOT NULL AND submission != ?',
+                        'viewid = ? AND iscollection = ? AND viewstatus = ? AND submission != ?',
                         array(
                                 $viewid,
                                 ($iscollection ? 1 : 0),
+                                self::STATUS_SUBMITTED,
                                 $submission->id
                         )
                 )
@@ -421,6 +409,7 @@ class assign_submission_mahara extends assign_submission_plugin {
                 $maharasubmission->viewurl = $url;
                 $maharasubmission->viewtitle = $title;
                 $maharasubmission->iscollection = (int) $iscollection;
+                $maharasubmission->viewstatus = self::STATUS_SELECTED;
                 return $DB->update_record('assignsubmission_mahara', $maharasubmission);
             } else {
                 $maharasubmission = new stdClass();
@@ -428,6 +417,7 @@ class assign_submission_mahara extends assign_submission_plugin {
                 $maharasubmission->viewurl = $url;
                 $maharasubmission->viewtitle = $title;
                 $maharasubmission->iscollection = (int) $iscollection;
+                $maharasubmission->viewstatus = self::STATUS_SELECTED;
 
                 $maharasubmission->submission = $submission->id;
                 $maharasubmission->assignment = $this->assignment->get_instance()->id;
@@ -451,7 +441,7 @@ class assign_submission_mahara extends assign_submission_plugin {
                 $maharasubmission->viewid = $data->viewid;
                 $maharasubmission->viewurl = $response['url'];
                 $maharasubmission->viewtitle = clean_text($response['title']);
-                $maharasubmission->viewaccesskey = $response['accesskey'];
+                $maharasubmission->viewstatus = self::STATUS_SUBMITTED;
                 $maharasubmission->iscollection = (int) $iscollection;
                 return $DB->update_record('assignsubmission_mahara', $maharasubmission);
             } else {
@@ -460,7 +450,7 @@ class assign_submission_mahara extends assign_submission_plugin {
                 $maharasubmission->viewid = $data->viewid;
                 $maharasubmission->viewurl = $response['url'];
                 $maharasubmission->viewtitle = clean_text($response['title']);
-                $maharasubmission->viewaccesskey = $response['accesskey'];
+                $maharasubmission->viewstatus = self::STATUS_SUBMITTED;
                 $maharasubmission->iscollection = (int) $iscollection;
 
                 $maharasubmission->submission = $submission->id;
@@ -507,7 +497,7 @@ class assign_submission_mahara extends assign_submission_plugin {
             throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
         }
         $maharasubmission->viewurl = $response['url'];
-        $maharasubmission->viewaccesskey = $response['accesskey'];
+        $maharasubmission->viewstatus = self::STATUS_SUBMITTED;
         $DB->update_record('assignsubmission_mahara', $maharasubmission);
     }
 
@@ -538,7 +528,7 @@ class assign_submission_mahara extends assign_submission_plugin {
             throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
         }
         $maharasubmission->viewurl = $response['url'];
-        $maharasubmission->viewaccesskey = $response['accesskey'];
+        $maharasubmission->viewstatus = self::STATUS_SUBMITTED;
         $DB->update_record('assignsubmission_mahara', $maharasubmission);
     }
 
@@ -568,7 +558,7 @@ class assign_submission_mahara extends assign_submission_plugin {
         if ($this->mnet_release_submited_view($maharasubmission->viewid, array(), $maharasubmission->iscollection) === false) {
             throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
         }
-        $maharasubmission->viewaccesskey = '';
+        $maharasubmission->viewstatus = self::STATUS_RELEASED;
         $DB->update_record('assignsubmission_mahara', $maharasubmission);
     }
 
@@ -593,7 +583,7 @@ class assign_submission_mahara extends assign_submission_plugin {
         if ($this->mnet_release_submited_view($maharasubmission->viewid, array(), $maharasubmission->iscollection) === false) {
             throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
         }
-        $maharasubmission->viewaccesskey = '';
+        $maharasubmission->viewstatus = self::STATUS_RELEASED;
         $DB->update_record('assignsubmission_mahara', $maharasubmission);
     }
 
@@ -670,12 +660,12 @@ class assign_submission_mahara extends assign_submission_plugin {
             $lastattempt = $DB->get_field('assign_submission', 'max(attemptnumber)', array('assignment' => $submission->assignment, 'groupid' => $submission->groupid, 'userid'=>$submission->userid));
             if ($submission->attemptnumber < $lastattempt) {
                 $result .= get_string('previousattemptsnotvisible', 'assignsubmission_mahara');
-            } else if ($submission->userid == $USER->id || !empty($maharasubmission->viewaccesskey)) {
+            } else if ($submission->userid == $USER->id || $maharasubmission->viewstatus = self::STATUS_SUBMITTED) {
                 // Either the page is viewed by the author or access code has been issued
                 $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
                 $url = $this->get_view_url($maharasubmission->viewurl);
                 return $this->get_preview_url($maharasubmission->viewtitle, $url);
-            } else if (empty($maharasubmission->viewaccesskey)) {
+            } else if ($maharasubmission->viewstatus != self::STATUS_SUBMITTED) {
                 $result .= get_string('needstobelocked', 'assignsubmission_mahara');
             }
         }
@@ -742,7 +732,7 @@ class assign_submission_mahara extends assign_submission_plugin {
 
         $url = new moodle_url($maharadata['url']);
         if ($url->get_param('mt')) {
-            $maharasubmission->viewaccesskey = $url->get_param('mt');
+            $maharasubmission->status = self::STATUS_SUBMITTED;
         }
 
         $maharasubmission->submission = $submission->id;
@@ -810,7 +800,7 @@ class assign_submission_mahara extends assign_submission_plugin {
             if ($this->mnet_release_submited_view($maharasubmission->viewid, array(), $maharasubmission->iscollection) === false) {
                 throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
             }
-            $maharasubmission->viewaccesskey = '';
+            $maharasubmission->viewstatus = self::STATUS_RELEASED;
             $DB->update_record('assignsubmission_mahara', $maharasubmission);
         }
     }

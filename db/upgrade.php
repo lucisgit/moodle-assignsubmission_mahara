@@ -34,17 +34,56 @@ function xmldb_assignsubmission_mahara_upgrade($oldversion) {
 
     if ($oldversion < 2013062401) {
 
-        // Define field iscollection to be added to assignsubmission_mahara.
-        $table = new xmldb_table('assignsubmission_mahara');
-        $field = new xmldb_field('iscollection', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'viewaccesskey');
+        // If you're migrating from the Portland U version of the plugin, we can skip this part because
+        // the table won't exist at all.
+        if ($dbman->table_exists('assignsubmission_mahara')) {
+            // Define field iscollection to be added to assignsubmission_mahara.
+            $table = new xmldb_table('assignsubmission_mahara');
+            $field = new xmldb_field('iscollection', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'viewaccesskey');
 
-        // Conditionally launch add field iscollection.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
+            // Conditionally launch add field iscollection.
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+
         }
 
         // Mahara savepoint reached.
         upgrade_plugin_savepoint(true, 2013062401, 'assignsubmission', 'mahara');
+    }
+
+    if ($oldversion < 2014071000) {
+
+        // If you're upgrading from the Portland U version of the plugin, this table won't exist yet, so you don't need to add the
+        // viewstatus column.
+        if ($dbman->table_exists('assignsubmission_mahara')) {
+            require_once($CFG->dirroot.'/mod/assign/submissionplugin.php');
+            require_once($CFG->dirroot.'/mod/assign/submission/mahara/locallib.php');
+
+            // Define field viewstatus to be added to assignsubmission_mahara.
+            $table = new xmldb_table('assignsubmission_mahara');
+            $field = new xmldb_field('viewstatus', XMLDB_TYPE_CHAR, '20', null, null, null, null, 'iscollection');
+
+            // Conditionally launch add field viewstatus.
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+
+            $DB->execute("update {assignsubmission_mahara} set viewstatus='".assign_submission_mahara::STATUS_SELECTED."' where viewaccesskey is null");
+            $DB->execute("update {assignsubmission_mahara} set viewstatus='".assign_submission_mahara::STATUS_SUBMITTED."' where viewaccesskey is not null");
+
+            // Define field viewaccesskey to be dropped from assignsubmission_mahara.
+            $table = new xmldb_table('assignsubmission_mahara');
+            $field = new xmldb_field('viewaccesskey');
+
+            // Conditionally launch drop field viewaccesskey.
+            if ($dbman->field_exists($table, $field)) {
+                $dbman->drop_field($table, $field);
+            }
+        }
+
+        // Mahara savepoint reached.
+        upgrade_plugin_savepoint(true, 2014071000, 'assignsubmission', 'mahara');
     }
 
     return true;

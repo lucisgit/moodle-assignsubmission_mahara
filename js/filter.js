@@ -11,7 +11,7 @@
 
 (function($) {
     var $searchBox = $.querySelector('#id_search');
-    var $divs = $.querySelectorAll('div[id^=fitem_id_view_]');
+    var $divs = $.querySelectorAll('div[id^=fitem_id_viewid_]');
 
     var toggleDiv = function(div, show) {
         if (!show && !div.style.display) {
