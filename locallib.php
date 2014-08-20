@@ -322,7 +322,7 @@ class assign_submission_mahara extends assign_submission_plugin {
         $responsedata = false;
         if (!is_enabled_auth('mnet')) {
             $error = get_string('authmnetdisabled', 'mnet');
-        } else if (!has_capability('moodle/site:mnetlogintoremote', get_context_instance(CONTEXT_SYSTEM), NULL, false)) {
+        } else if (!has_capability('moodle/site:mnetlogintoremote', context_system::instance())) {
             $error = get_string('notpermittedtojump', 'mnet');
         } else {
             // Set up the RPC request.
