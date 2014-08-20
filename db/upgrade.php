@@ -86,5 +86,75 @@ function xmldb_assignsubmission_mahara_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014071000, 'assignsubmission', 'mahara');
     }
 
+    if ($oldversion < 2014082000) {
+
+        // Migrate from the Portland U version of the plugin
+        if (
+                !$dbman->table_exists('assignsubmission_mahara')
+                && $dbman->table_exists('assign_mahara_submit_views')
+                && $dbman->table_exists('mahara_portfolio')
+        ) {
+            require_once($CFG->dirroot.'/mod/assign/submissionplugin.php');
+            require_once($CFG->dirroot.'/mod/assign/submission/mahara/locallib.php');
+
+            // Change config name
+            $DB->set_field(
+                    'assign_plugin_config',
+                    'name',
+                    'mnethostid',
+                    array(
+                            'plugin' => 'mahara',
+                            'subtype' => 'assignsubmission',
+                            'name' => 'mahara_host'
+                    )
+            );
+
+            // Define table assignsubmission_mahara to be created.
+            $table = new xmldb_table('assignsubmission_mahara');
+
+            // Adding fields to table assignsubmission_mahara.
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('assignment', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('submission', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('viewid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('viewurl', XMLDB_TYPE_TEXT, null, null, null, null, null);
+            $table->add_field('viewtitle', XMLDB_TYPE_TEXT, null, null, null, null, null);
+            $table->add_field('iscollection', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('viewstatus', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+
+            // Adding keys to table assignsubmission_mahara.
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+            $table->add_key('assignment', XMLDB_KEY_FOREIGN, array('assignment'), 'assign', array('id'));
+            $table->add_key('submission', XMLDB_KEY_FOREIGN, array('submission'), 'assign_submission', array('id'));
+            $dbman->create_table($table);
+
+            // Migrate data from assign_mahara_submit_views && mahara_portfolio tables
+            $rs = $DB->get_recordset('assign_mahara_submit_views', null, 'id');
+            foreach ($rs as $submissiondata) {
+                $page = $DB->get_record('mahara_portfolio', array('id'=>$submissiondata->portfolio));
+                $todb = new stdClass();
+                $todb->assignment = $submissiondata->assignment;
+                $todb->submission = $submissiondata->submission;
+                $todb->viewid = $page->page;
+                $todb->viewurl = $page->url;
+                $todb->viewtitle = $page->title;
+                $todb->iscollection = 0;
+                $status = $submissiondata->status;
+                if ($status == assign_submission_mahara::STATUS_RELEASED || $status == assign_submission_mahara::STATUS_SELECTED || $status == assign_submission_mahara::STATUS_SUBMITTED) {
+                    $todb->status = $status;
+                }
+                else {
+                }
+                $todb->status = $submissiondata->status;
+                $DB->insert_record('assignsubmission_mahara', $todb);
+            }
+            $dbman->drop_table(new xmldb_table('assign_mahara_submit_views'));
+            $dbman->drop_table(new xmldb_table('mahara_portfolio'));
+
+        }
+        // Mahara savepoint reached.
+        upgrade_plugin_savepoint(true, 2014082000, 'assignsubmission', 'mahara');
+    }
+
     return true;
 }
