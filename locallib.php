@@ -564,8 +564,7 @@ class assign_submission_mahara extends assign_submission_plugin {
         if ($this->mnet_release_submited_view($maharasubmission->viewid, array(), $maharasubmission->iscollection) === false) {
             throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
         }
-        $maharasubmission->viewstatus = self::STATUS_RELEASED;
-        $DB->update_record('assignsubmission_mahara', $maharasubmission);
+        $this->set_mahara_submission_status($maharasubmission->submission, self::STATUS_RELEASED);
     }
 
     /**
@@ -738,7 +737,7 @@ class assign_submission_mahara extends assign_submission_plugin {
 
         $url = new moodle_url($maharadata['url']);
         if ($url->get_param('mt')) {
-            $maharasubmission->status = self::STATUS_SUBMITTED;
+            $maharasubmission->viewstatus = self::STATUS_SUBMITTED;
         }
 
         $maharasubmission->submission = $submission->id;
@@ -806,8 +805,23 @@ class assign_submission_mahara extends assign_submission_plugin {
             if ($this->mnet_release_submited_view($maharasubmission->viewid, array(), $maharasubmission->iscollection) === false) {
                 throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
             }
-            $maharasubmission->viewstatus = self::STATUS_RELEASED;
-            $DB->update_record('assignsubmission_mahara', $maharasubmission);
+            $this->set_mahara_submission_status($maharasubmission->submission, self::STATUS_RELEASED);
         }
+    }
+
+    /**
+     * Helper method to set the status of the an assignsubmission_mahara record
+     *
+     * @param int $submissionid
+     * @param string $status
+     * @throws moodle_exception
+     * @return boolean
+     */
+    public function set_mahara_submission_status($submissionid, $status) {
+        global $DB;
+        if (!($status === self::STATUS_SELECTED || $status === self::STATUS_SUBMITTED || $status === self::STATUS_RELEASED)) {
+            throw new moodle_exception('errorinvalidstatus', 'assignsubmission_mahara');
+        }
+        return $DB->set_field('assignsubmission_mahara', 'viewstatus', $status, array('submission' => $submissionid));
     }
 }
