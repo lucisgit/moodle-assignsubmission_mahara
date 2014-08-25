@@ -194,15 +194,23 @@ class assign_submission_mahara extends assign_submission_plugin {
         $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
         $url = new moodle_url('/auth/mnet/jump.php', array('hostid' => $remotehost->id));
         $remotehost->jumpurl = $url->out();
+
         // Updating section header and adding description line.
         $mform->getElement('header_mahara')->_text = $remotehost->name;
-        $mform->addElement('static', '', '', get_string('selectmaharaview', 'assignsubmission_mahara', $remotehost));
 
         // See if any of views are already in use, we will remove them from select.
         if (count($viewids) || count($views['collections']['data'])) {
+
+            $mform->addElement('static', '', '', get_string('selectmaharaview', 'assignsubmission_mahara', $remotehost));
+
+            // Add "none selected" option
+            $mform->addElement('radio', 'viewid', '', '(none selected)', 'none');
+            $mform->setDefault('viewid', 'none');
+
             $mform->addElement('text', 'search', get_string('search'));
             $mform->setType('search', PARAM_RAW);
             $mform->addElement('html', '<hr/><br/>');
+
             if (count($views['data'])) {
                 $mform->addElement('static', 'view_by',
                     get_string('viewsby', 'assignsubmission_mahara', $views['displayname'])
@@ -237,10 +245,11 @@ class assign_submission_mahara extends assign_submission_plugin {
         else {
             $mform->addElement(
                     'static',
-                    'no_pages',
-                    "<strong>" . get_string('error') . "</strong>",
-                    get_string('noviewscreated', 'assignsubmission_mahara', $host->name)
+                    '',
+                    '',
+                    get_string('noviewscreated', 'assignsubmission_mahara', $remotehost)
             );
+            $mform->addElement('hidden', 'viewid', 'none');
             return;
         }
 
@@ -371,17 +380,30 @@ class assign_submission_mahara extends assign_submission_plugin {
 
         // Because the drop-down menu contains collections & views, we make the id
         // start with "v" or "c" to indicate the type, e.g. v30, c100
-        $iscollection = ($data->viewid[0] == 'c');
-        $data->viewid = substr($data->viewid, 1);
+        if ($data->viewid == 'none') {
+            $data->viewid = null;
+        } else {
+            $iscollection = ($data->viewid[0] == 'c');
+            $data->viewid = substr($data->viewid, 1);
+        }
 
         $maharasubmission = $this->get_mahara_submission($submission->id);
         if ($submission->status === ASSIGN_SUBMISSION_STATUS_DRAFT) {
             // Draft. All we need to do is just save or update submitted view data.
+            if ($data->viewid === null) {
+                // They selected "(nothing selected)", so remove their Mahara selection
+                return $DB->delete_records(
+                        'assignsubmission_mahara',
+                        array('submission' => $submission->id)
+                );
+            }
+
             if (!$views = $this->mnet_get_views()) {
                 // Wrap recorded error in language string and return false.
                 $this->set_error(get_string('errormnetrequest', 'assignsubmission_mahara', $this->get_error()));
                 return false;
             }
+
             if ($iscollection) {
                 $foundcoll = false;
                 if (!is_array($views['collections']['data'])) {
@@ -431,6 +453,20 @@ class assign_submission_mahara extends assign_submission_plugin {
             }
         } else {
             // This is not the draft, but the actual submission. Process it properly.
+
+            // If viewid is null, it means they selected no page. In which case if there is
+            // a currently selected page we should remove it and unlock the Mahara page.
+            if ($data->viewid === null) {
+                if ($maharasubmission) {
+                    if ($this->mnet_release_submited_view($maharasubmission->viewid, array(), $maharasubmission->iscollection) === false) {
+                        throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
+                    }
+                    return $DB->delete_records('assignsubmission_mahara', array('submission' => $submission->id));
+                } else {
+                    return true;
+                }
+            }
+
             // Lock submission on mahara side.
             if (!$response = $this->mnet_submit_view($submission, $data->viewid, $iscollection)) {
                 throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
@@ -443,6 +479,7 @@ class assign_submission_mahara extends assign_submission_plugin {
                         throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
                     }
                 }
+
                 // Update submission data.
                 $maharasubmission->viewid = $data->viewid;
                 $maharasubmission->viewurl = $response['url'];
@@ -451,17 +488,21 @@ class assign_submission_mahara extends assign_submission_plugin {
                 $maharasubmission->iscollection = (int) $iscollection;
                 return $DB->update_record('assignsubmission_mahara', $maharasubmission);
             } else {
-                // We are dealing with the new submission.
-                $maharasubmission = new stdClass();
-                $maharasubmission->viewid = $data->viewid;
-                $maharasubmission->viewurl = $response['url'];
-                $maharasubmission->viewtitle = clean_text($response['title']);
-                $maharasubmission->viewstatus = self::STATUS_SUBMITTED;
-                $maharasubmission->iscollection = (int) $iscollection;
+                if ($data->viewid === null) {
+                    return $DB->delete_records('assignsubmission_mahara', array('submission' => $submission->id));
+                } else {
+                    // We are dealing with the new submission.
+                    $maharasubmission = new stdClass();
+                    $maharasubmission->viewid = $data->viewid;
+                    $maharasubmission->viewurl = $response['url'];
+                    $maharasubmission->viewtitle = clean_text($response['title']);
+                    $maharasubmission->viewstatus = self::STATUS_SUBMITTED;
+                    $maharasubmission->iscollection = (int) $iscollection;
 
-                $maharasubmission->submission = $submission->id;
-                $maharasubmission->assignment = $this->assignment->get_instance()->id;
-                return $DB->insert_record('assignsubmission_mahara', $maharasubmission) > 0;
+                    $maharasubmission->submission = $submission->id;
+                    $maharasubmission->assignment = $this->assignment->get_instance()->id;
+                    return $DB->insert_record('assignsubmission_mahara', $maharasubmission) > 0;
+                }
             }
         }
     }

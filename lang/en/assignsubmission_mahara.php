@@ -24,6 +24,7 @@
 
 $string['assign_submission_mahara_name'] = 'Assign Submission Mahara services';
 $string['assign_submission_mahara_description'] = 'Mahara functions used in Mahara portfolio Assign Submission plugin.<br />Publishing this service on a Moodle site has no effect. Subscribe to this service if you want to be able to use assignments with {$a}.<br />';
+$string['collectionsby'] = 'Collections by {$a}';
 $string['default'] = 'Enabled by default';
 $string['default_help'] = 'If set, this submission method will be enabled by default for all new assignments.';
 $string['enabled'] = 'Mahara portfolio';
@@ -35,7 +36,7 @@ $string['vieworcollectionalreadysubmitted'] = 'The selected Mahara view or colle
 $string['mahara'] = 'Mahara portfolio';
 $string['needstobelocked'] = 'Draft submission either needs to be submitted for assessment by user or locked before view link will be available.';
 $string['nomaharahostsfound'] = 'No mahara hosts found.';
-$string['noviewscreated'] = 'No available pages or collections found.';
+$string['noviewscreated'] = 'You have no available Mahara pages or collections. Please <a href="{$a->jumpurl}">click here</a> and create one.';
 $string['option_collections'] = 'Collections';
 $string['option_views'] = 'Views';
 $string['pluginname'] = 'Mahara portfolio';
@@ -46,4 +47,3 @@ $string['site_help'] = 'This setting lets you select which Mahara site your stud
 $string['outputforlog'] = '{$a->remotehostname}: {$a->viewtitle} (view id: {$a->viewid})';
 $string['outputforlognew'] = 'New {$a} submission.';
 $string['viewsby'] = 'Pages by {$a}';
-$string['collectionsby'] = 'Collections by {$a}';
