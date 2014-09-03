@@ -36,12 +36,12 @@ $string['vieworcollectionalreadysubmitted'] = 'The selected Mahara view or colle
 $string['mahara'] = 'Mahara portfolio';
 $string['needstobelocked'] = 'Draft submission either needs to be submitted for assessment by user or locked before view link will be available.';
 $string['nomaharahostsfound'] = 'No mahara hosts found.';
-$string['noviewscreated'] = 'You have no available Mahara pages or collections. Please <a href="{$a->jumpurl}">click here</a> and create one.';
+$string['noviewscreated'] = 'You have no available Mahara pages or collections. Please <a target="_blank" href="{$a->jumpurl}">click here</a> to visit "{$a->name}" and create a new one.';
 $string['option_collections'] = 'Collections';
 $string['option_views'] = 'Views';
 $string['pluginname'] = 'Mahara portfolio';
 $string['previousattemptsnotvisible'] = 'Previous attempts with the Mahara submission plugin are not visible.';
-$string['selectmaharaview'] = 'Select one of your available portfolio pages or collections from the list below, or <a href="{$a->jumpurl}">click here</a> to visit "{$a->name}" and create a new one.';
+$string['selectmaharaview'] = 'Select one of your available portfolio pages or collections from the list below, or <a target="_blank" href="{$a->jumpurl}">click here</a> to visit "{$a->name}" and create a new one.';
 $string['site'] = 'Site';
 $string['site_help'] = 'This setting lets you select which Mahara site your students should submit their pages from.';
 $string['outputforlog'] = '{$a->remotehostname}: {$a->viewtitle} (view id: {$a->viewid})';
