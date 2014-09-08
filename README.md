@@ -1,4 +1,4 @@
-assignsubmission-mahara
+moodle-assignsubmission-mahara
 ============================
 
 Mahara assignment submission plugin for Moodle 2.6
@@ -27,31 +27,6 @@ Mahara assignment submission plugin for Moodle 2.3+:
  - The version developed by the University of Portland: https://github.com/fellowapeman/moodle-assign_mahara
  - The version developed by Lancaster University: https://github.com/catalyst/assignsubmission_mahara
 
-Implementation logic:
----------------------
-
-A Moodle assignment with a "Mahara" submission component, allows the student to pick
-one of their pages or collections from Mahara, as part of their assignment submission.
-
-* Individual pages that are part of collections cannot be picked on their own (the entire collection must be picked instead)
-* Pages or collections that are already locked due to being submitted to a Mahara group or another Moodle assignment, are also not available
-
-The page or collection will be locked from editing in Mahara if the assignment is
-submitted and/or locked in the Moodle gradebook.
-
-This means that if the Moodle assignment requires students to click the submit
-button to declare the submission final (an option in the assignment settings), the
-page or collection will not be locked in Mahara until the submit button is clicked.
-If the assignment does not require students to click the submit button, the page or
-collection will be locked in Mahara as soon as it is selected. If the student changes
-their selected page (e.g. before the assignment deadline), the originally selected
-page will be unlocked and the newly selected one locked instead.
-
-By itself, this plugin will permanently locked pages and collections in Mahara once
-they are submitted to Mahara. As mentioned earlier, you can use the related assignment
-feedback plugin to make pages and collections unlock after grading.
-
-
 Installation
 ------------
 1. Make sure that your Moodle and Mahara versions are up to date.
@@ -77,7 +52,6 @@ of the plugin you have installed, and migrate it accordingly. So all you need to
 3. If you have also installed the Mahara assignment feedback plugin (mod/assign/feedback/mahara), you should now upgrade it to the version at https://github.com/catalyst/moodle-assignfeedback_mahara/tree/moodle26-merged
 4. If you have also installed the Mahara local plugin (local/mahara), you should now uninstall it.
 
-
 About those patches
 -------------------
 
@@ -93,3 +67,27 @@ patch -p0 < /path/to/mahara-patch.txt
 cd /var/www/path/to/moodle
 patch -p0 < /path to/moodle-patch.txt
 ```
+
+Implementation logic:
+---------------------
+
+A Moodle assignment with a "Mahara" submission component, allows the student to pick
+one of their pages or collections from Mahara, as part of their assignment submission.
+
+* Individual pages that are part of collections cannot be picked on their own (the entire collection must be picked instead)
+* Pages or collections that are already locked due to being submitted to a Mahara group or another Moodle assignment, are also not available
+
+The page or collection will be locked from editing in Mahara if the assignment is
+submitted and/or locked in the Moodle gradebook.
+
+This means that if the Moodle assignment requires students to click the submit
+button to declare the submission final (an option in the assignment settings), the
+page or collection will not be locked in Mahara until the submit button is clicked.
+If the assignment does not require students to click the submit button, the page or
+collection will be locked in Mahara as soon as it is selected. If the student changes
+their selected page (e.g. before the assignment deadline), the originally selected
+page will be unlocked and the newly selected one locked instead.
+
+By itself, this plugin will permanently locked pages and collections in Mahara once
+they are submitted to Mahara. As mentioned earlier, you can use the related assignment
+feedback plugin to make pages and collections unlock after grading.
