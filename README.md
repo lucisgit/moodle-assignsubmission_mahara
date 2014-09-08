@@ -1,27 +1,34 @@
 assignsubmission-mahara
 ============================
 
-Mahara assignment submission plugin for Moodle 2.3+
+Mahara assignment submission plugin for Moodle 2.6
 
 This plugin adds Mahara pages submission functionality to assignments in Moodle.
 The plugin works with the new "mod/assign" type introduced in 2.3. It requires 
 at least one Mahara site linked to Moodle via MNet.
 
-The plugin has the same funtionality as the older "mod/assignment" Mahara 
-assignment plugin (https://gitorious.org/mahara-contrib/mod-assignment-type-mahara) 
-with some improvements. In particular:
+This plugin allows a teacher to add a "Mahara" item to the submission options for 
+a Moodle assignment. Students can then select one of the pages or collections from
+their Mahara portfolio as part of their assignment submission.
 
-* A graded Mahara page will never become editable again.
-* The same page cannot be submitted more than once.
-* If the assignment allows drafts, the Mahara page is not locked from editing until the final submission.
-* Collections can be submitted instead of only individual pages.
+The submitted Mahara page or collection will be locked from editing in Mahara, the
+same as if it had been submitted to a Mahara group. However, unlike group submissions,
+pages and collections submitted to Moodle remain permanently locked even after grading.
+If you'd like the submitted pages and collections to be unlocked after grading, install 
+the Mahara assignment feedback plugin for Moodle:
+https://github.com/catalyst/moodle-assignfeedback_mahara/tree/moodle26-merged
 
 The plugin also allows migrating old Mahara "mod/assignment" assignments to the new
 type. The plugin does not include featues to communicate with the outcomes artefact
 plugin.
 
-Logic
------
+This particular git branch (moodle26-merged) is meant to merge the two forks of the
+Mahara assignment submission plugin for Moodle 2.3+:
+ - The version developed by the University of Portland: https://github.com/fellowapeman/moodle-assign_mahara
+ - The version developed by Lancaster University: https://github.com/catalyst/assignsubmission_mahara
+
+Implementation logic:
+---------------------
 
 A Moodle assignment with a "Mahara" submission component, allows the student to pick
 one of their pages or collections from Mahara, as part of their assignment submission.
@@ -40,17 +47,10 @@ collection will be locked in Mahara as soon as it is selected. If the student ch
 their selected page (e.g. before the assignment deadline), the originally selected
 page will be unlocked and the newly selected one locked instead.
 
-Currently, pages and collections are designed to be permanently locked in Mahara
-once they are submitted to Moodle. Future development plans may allow for pages and
-collections to be unlocked. For now, the primary workaround is for students to make
-a copy of the locked page or collection in Mahara and use that for future edits, 
-which leaves an audit trail of past submissions.
+By itself, this plugin will permanently locked pages and collections in Mahara once
+they are submitted to Mahara. As mentioned earlier, you can use the related assignment
+feedback plugin to make pages and collections unlock after grading.
 
-(There is an unwieldy workaround that allows a teacher to unlock a submitted page or
-collection. The teacher can grant the student another attempt, via the gradebook. If
-the assignment allows drafts, this will put the student's submission back into "draft"
-status, unlocking the page or collection. If the assignment does not allow drafts,
-the student will need to edit their submission and choose a different page or collection.)
 
 Installation
 ------------
@@ -63,6 +63,20 @@ Installation
 6. On the Moodle page "Site Admin" -> "Networking" -> "Peers", choose the Mahara site.
       Open the "Services" tab and enable "Assign Submission Mahara" services.
 7. Now you may create your first Mahara assignment.
+
+
+Upgrading
+---------
+
+This plugin is designed to allow you to upgrade from either the University of Portland
+version, or the Lancaster University version. It will automatically detect which version
+of the plugin you have installed, and migrate it accordingly. So all you need to do is:
+
+1. Remove the current contents of your mod/assign/submission/mahara directory
+2. Follow the steps under "Installation" above. (This will trigger the database upgrade script.)
+3. If you have also installed the Mahara assignment feedback plugin (mod/assign/feedback/mahara), you should now upgrade it to the version at https://github.com/catalyst/moodle-assignfeedback_mahara/tree/moodle26-merged
+4. If you have also installed the Mahara local plugin (local/mahara), you should now uninstall it.
+
 
 About those patches
 -------------------
