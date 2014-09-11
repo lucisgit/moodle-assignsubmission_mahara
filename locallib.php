@@ -70,45 +70,20 @@ class assign_submission_mahara extends assign_submission_plugin {
      * @return void
      */
     public function get_settings(MoodleQuickForm $mform) {
-        global $CFG, $DB;
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/assign/submission/mahara/lib.php');
 
-        $defaultmnethostid = $this->get_config('mnethostid');
+        if ($hosts = assignsubmission_mahara_sitelist()) {
 
-        // Get Mahara hosts we are doing SSO with.
-        $sql = "
-             SELECT DISTINCT
-                 h.id,
-                 h.name
-             FROM
-                 {mnet_host} h,
-                 {mnet_application} a,
-                 {mnet_host2service} h2s_IDP,
-                 {mnet_service} s_IDP,
-                 {mnet_host2service} h2s_SP,
-                 {mnet_service} s_SP
-             WHERE
-                 h.id != :mnet_localhost_id AND
-                 h.id = h2s_IDP.hostid AND
-                 h.deleted = 0 AND
-                 h.applicationid = a.id AND
-                 h2s_IDP.serviceid = s_IDP.id AND
-                 s_IDP.name = 'sso_idp' AND
-                 h2s_IDP.publish = '1' AND
-                 h.id = h2s_SP.hostid AND
-                 h2s_SP.serviceid = s_SP.id AND
-                 s_SP.name = 'sso_idp' AND
-                 h2s_SP.publish = '1' AND
-                 a.name = 'mahara'
-             ORDER BY
-                 h.name";
-
-        if ($hosts = $DB->get_records_sql($sql, array('mnet_localhost_id'=>$CFG->mnet_localhost_id))) {
-            // Some hosts found, build select element.
-            foreach ($hosts as &$h) {
-                $h = $h->name;
+            $hostid = $this->get_config('mahara_host');
+            if ($hostid === false) {
+                // No setting for this instance, so use the sitewide default
+                $hostid = get_config('assignsubmission_mahara', 'host');
             }
+
+            // Menu to select which MNet host
             $mform->addElement('select', 'assignsubmission_mahara_mnethostid', get_string('site', 'assignsubmission_mahara'), $hosts);
-            $mform->setDefault('assignsubmission_mahara_mnethostid', $defaultmnethostid);
+            $mform->setDefault('assignsubmission_mahara_mnethostid', $this->get_config('mnethostid'));
             $mform->disabledIf('assignsubmission_mahara_mnethostid', 'assignsubmission_mahara_enabled', 'notchecked');
         } else {
             // No hosts found.
@@ -125,7 +100,15 @@ class assign_submission_mahara extends assign_submission_plugin {
      * @return bool
      */
     public function save_settings(stdClass $data) {
-        $this->set_config('mnethostid', $data->assignsubmission_mahara_mnethostid);
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/assign/submission/mahara/lib.php');
+
+        $hostid = $data->assignsubmission_mahara_mnethostid;
+        if ($hostid && !array_key_exists($hostid, assignsubmission_mahara_sitelist())) {
+            $this->set_error(get_string('errorinvalidhost', 'assignsubmission_mahara'));
+            return false;
+        }
+        $this->set_config('mnethostid', $hostid);
         return true;
     }
 
