@@ -25,8 +25,8 @@
 $string['assign_submission_mahara_name'] = 'Assign Submission Mahara services';
 $string['assign_submission_mahara_description'] = 'Mahara functions used in Mahara portfolio Assign Submission plugin.<br />Publishing this service on a Moodle site has no effect. Subscribe to this service if you want to be able to use assignments with {$a}.<br />';
 $string['collectionsby'] = 'Collections by {$a}';
-$string['default'] = 'Enabled by default';
-$string['default_help'] = 'If set, this submission method will be enabled by default for all new assignments.';
+$string['defaulton'] = 'Enabled by default';
+$string['defaulton_help'] = 'If set, this submission method will be enabled by default for all new assignments.';
 $string['defaultsite'] = 'Default site';
 $string['defaultsite_help'] = 'The default site to use in new Mahara submission assignments.';
 $string['enabled'] = 'Mahara portfolio';
