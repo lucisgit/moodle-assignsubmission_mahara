@@ -254,7 +254,7 @@ class assign_submission_mahara extends assign_submission_plugin {
                     get_string('noviewscreated', 'assignsubmission_mahara', $remotehost)
             );
             $mform->addElement('hidden', 'viewid', 'none');
-            return;
+            return true;
         }
 
     }
