@@ -669,10 +669,6 @@ class assign_submission_mahara extends assign_submission_plugin {
     /**
      * Display the view of submission.
      *
-     * We should not normally hit this, as we override view link in view_summary
-     * method. But just in case user shomehow hit viewing from Moodle context,
-     * display the link to portfolio page.
-     *
      * @global stdClass $DB
      * @global stdClass $USER
      * @param stdClass $submission
@@ -689,13 +685,11 @@ class assign_submission_mahara extends assign_submission_plugin {
             $lastattempt = $DB->get_field('assign_submission', 'max(attemptnumber)', array('assignment' => $submission->assignment, 'groupid' => $submission->groupid, 'userid'=>$submission->userid));
             if ($submission->attemptnumber < $lastattempt) {
                 $result .= get_string('previousattemptsnotvisible', 'assignsubmission_mahara');
-            } else if ($submission->userid == $USER->id || $maharasubmission->viewstatus = self::STATUS_SUBMITTED) {
+            } else {
                 // Either the page is viewed by the author or access code has been issued
                 $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
                 $url = $this->get_view_url($maharasubmission->viewurl);
                 return $this->get_preview_url($maharasubmission->viewtitle, $url);
-            } else if ($maharasubmission->viewstatus != self::STATUS_SUBMITTED) {
-                $result .= get_string('needstobelocked', 'assignsubmission_mahara');
             }
         }
         return $result;

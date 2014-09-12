@@ -37,7 +37,6 @@ $string['errorinvalidhost'] = 'Invalid host id selected';
 $string['errorinvalidstatus'] = 'Developer Error: Invalid submission status sent to assign_submission_mahara::set_mahara_submission_status()';
 $string['errorvieworcollectionalreadysubmitted'] = 'The selected Mahara view or collection could not be submitted. Please choose another.';
 $string['mahara'] = 'Mahara portfolio';
-$string['needstobelocked'] = 'Draft submission either needs to be submitted for assessment by user or locked before view link will be available.';
 $string['nomaharahostsfound'] = 'No mahara hosts found.';
 $string['noviewscreated'] = 'You have no available Mahara pages or collections. Please <a target="_blank" href="{$a->jumpurl}">click here</a> to visit "{$a->name}" and create a new one.';
 $string['option_collections'] = 'Collections';
