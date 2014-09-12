@@ -50,3 +50,21 @@ if ($hosts = assignsubmission_mahara_sitelist ()) {
             )
     );
 }
+
+$settings->add(
+    new admin_setting_configselect(
+        'assignsubmission_mahara/lock',
+        new lang_string(
+                'defaultlockpages',
+                'assignsubmission_mahara',
+                new lang_string('lockpages', 'assignsubmission_mahara')
+        ),
+        new lang_string(
+                'defaultlockpages_help',
+                'assignsubmission_mahara',
+                new lang_string('lockpages', 'assignsubmission_mahara')
+        ),
+        1,
+        array(0 => new lang_string('no'), 1 => new lang_string('yes'))
+    )
+);

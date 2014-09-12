@@ -25,6 +25,8 @@
 $string['assign_submission_mahara_name'] = 'Assign Submission Mahara services';
 $string['assign_submission_mahara_description'] = 'Mahara functions used in Mahara portfolio Assign Submission plugin.<br />Publishing this service on a Moodle site has no effect. Subscribe to this service if you want to be able to use assignments with {$a}.<br />';
 $string['collectionsby'] = 'Collections by {$a}';
+$string['defaultlockpages'] = 'Default "{$a}"';
+$string['defaultlockpages_help'] = 'Default setting to use for the "{$a}" setting in new Mahara assignments.';
 $string['defaulton'] = 'Enabled by default';
 $string['defaulton_help'] = 'If set, this submission method will be enabled by default for all new assignments.';
 $string['defaultsite'] = 'Default "{$a}"';
@@ -36,6 +38,8 @@ $string['errormnetrequest'] = 'Attempt to send mnet request resulted in error: {
 $string['errorinvalidhost'] = 'Invalid host id selected';
 $string['errorinvalidstatus'] = 'Developer Error: Invalid submission status sent to assign_submission_mahara::set_mahara_submission_status()';
 $string['errorvieworcollectionalreadysubmitted'] = 'The selected Mahara view or collection could not be submitted. Please choose another.';
+$string['lockpages'] = 'Lock submitted pages';
+$string['lockpages_help'] = 'If set, submitted Mahara pages and collections will be locked from editing in Mahara. (If you are also using the Mahara feedback plugin, they will be unlocked once the submission is graded.)';
 $string['mahara'] = 'Mahara portfolio';
 $string['nomaharahostsfound'] = 'No mahara hosts found.';
 $string['noviewscreated'] = 'You have no available Mahara pages or collections. Please <a target="_blank" href="{$a->jumpurl}">click here</a> to visit "{$a->name}" and create a new one.';
