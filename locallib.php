@@ -75,7 +75,7 @@ class assign_submission_mahara extends assign_submission_plugin {
 
         if ($hosts = assignsubmission_mahara_sitelist()) {
 
-            $hostid = $this->get_config('mahara_host');
+            $hostid = $this->get_config('mnethostid');
             if ($hostid === false) {
                 // No setting for this instance, so use the sitewide default
                 $hostid = get_config('assignsubmission_mahara', 'host');
@@ -83,7 +83,7 @@ class assign_submission_mahara extends assign_submission_plugin {
 
             // Menu to select which MNet host
             $mform->addElement('select', 'assignsubmission_mahara_mnethostid', get_string('site', 'assignsubmission_mahara'), $hosts);
-            $mform->setDefault('assignsubmission_mahara_mnethostid', $this->get_config('mnethostid'));
+            $mform->setDefault('assignsubmission_mahara_mnethostid', $hostid);
             $mform->disabledIf('assignsubmission_mahara_mnethostid', 'assignsubmission_mahara_enabled', 'notchecked');
         } else {
             // No hosts found.
