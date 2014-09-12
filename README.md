@@ -68,26 +68,29 @@ cd /var/www/path/to/moodle
 patch -p0 < /path to/moodle-patch.txt
 ```
 
-Implementation logic:
----------------------
+A little info about what it does:
+---------------------------------
 
-A Moodle assignment with a "Mahara" submission component, allows the student to pick
-one of their pages or collections from Mahara, as part of their assignment submission.
+This plugin adds a "Mahara" submission method to "assignment" activities in Moodle.
+When a teacher creates an "assignment" activity, they'll see "Mahara" as one of the
+submission method options. This submission method will ask students to select one
+of their pages or collections from Mahara, to include as part of their assignment
+submission. (Therefore, this plugin requires your Moodle site to be connected to a
+Mahara site via MNet.)
 
 * Individual pages that are part of collections cannot be picked on their own (the entire collection must be picked instead)
 * Pages or collections that are already locked due to being submitted to a Mahara group or another Moodle assignment, are also not available
 
-The page or collection will be locked from editing in Mahara if the assignment is
-submitted and/or locked in the Moodle gradebook.
+Optionally, the assignment may lock the submitted pages and collections from being edited
+in Mahara. This is recommended, because otherwise students will be able to continue
+editing part of their assignment submission even after the assignment deadline. If you
+would like the submitted pages and collections to become unlocked after grading, you
+may use the related assignment feedback plugin for that purpose.
 
-This means that if the Moodle assignment requires students to click the submit
-button to declare the submission final (an option in the assignment settings), the
-page or collection will not be locked in Mahara until the submit button is clicked.
-If the assignment does not require students to click the submit button, the page or
-collection will be locked in Mahara as soon as it is selected. If the student changes
-their selected page (e.g. before the assignment deadline), the originally selected
-page will be unlocked and the newly selected one locked instead.
+If you choose to use the page locking feature (which, again, is the default behavior and
+is recommended) note that:
+* Pages & collections that are part of a draft submission will be not be locked until the draft is submitted.
+* The Mahara page will be locked if the submission is submitted OR the submission is "locked" via the Moodle gradebook.
+* If a submission is "reopened" via the Moodle gradebook, the page will become unlocked.
 
-By itself, this plugin will permanently locked pages and collections in Mahara once
-they are submitted to Mahara. As mentioned earlier, you can use the related assignment
-feedback plugin to make pages and collections unlock after grading.
+If you need help, try the Moodle-Mahara Integration forum on mahara.org: https://mahara.org/interaction/forum/view.php?id=30
