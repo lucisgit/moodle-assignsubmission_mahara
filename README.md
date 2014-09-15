@@ -1,7 +1,7 @@
 assignsubmission-mahara
 ============================
 
-Mahara assignment submission plugin for Moodle 2.3+
+Mahara assignment submission plugin for Moodle 2.7+
 
 This plugin adds Mahara pages submission functionality to assignments in Moodle.
 The plugin works with the new "mod/assign" type introduced in 2.3. It requires 
@@ -77,5 +77,5 @@ For information about how to apply a patch file, try Google. If you are using Li
 cd /var/www/path/to/mahara
 patch -p0 < /path/to/mahara-patch.txt
 cd /var/www/path/to/moodle
-patch -p0 < /path to/moodle-patch.txt
+patch -p0 < /path/to/moodle-patch.txt
 ```
