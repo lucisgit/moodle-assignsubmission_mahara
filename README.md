@@ -16,7 +16,7 @@ same as if it had been submitted to a Mahara group. However, unlike group submis
 pages and collections submitted to Moodle remain permanently locked even after grading.
 If you'd like the submitted pages and collections to be unlocked after grading, install 
 the Mahara assignment feedback plugin for Moodle:
-https://github.com/catalyst/moodle-assignfeedback_mahara/tree/moodle26-merged
+https://github.com/MaharaProject/moodle-assignfeedback-mahara
 
 The plugin also allows migrating old Mahara "mod/assignment" assignments to the new
 type. The plugin does not include featues to communicate with the outcomes artefact
@@ -25,14 +25,13 @@ plugin.
 This particular git branch (moodle26-merged) is meant to merge the two forks of the
 Mahara assignment submission plugin for Moodle 2.3+:
  - The version developed by the University of Portland: https://github.com/fellowapeman/moodle-assign_mahara
- - The version developed by Lancaster University: https://github.com/catalyst/assignsubmission_mahara
+ - The version developed by Lancaster University: https://github.com/lucisgit/assignsubmission_mahara
 
 Installation
 ------------
 1. Make sure that your Moodle and Mahara versions are up to date.
-2. Apply the patch "mahara-patch.txt" to your Mahara site.
-3. If you are using Moodle 2.6 or earlier, apply the patch "moodle-patch.txt" to your 
-      Moodle site.
+2. If you are using Mahara 1.9 or earlier, apply the patch "mahara-patch.txt" to your Mahara site.
+3. If you are using Moodle 2.6 or earlier, apply the patch "moodle-patch.txt" to your Moodle site.
 4. Copy the contents of this project to mod/assign/submission/mahara in your Moodle site.
 5. Proceed with plugin installation in Moodle.
 6. On the Moodle page "Site Admin" -> "Networking" -> "Peers", choose the Mahara site.
@@ -49,7 +48,7 @@ of the plugin you have installed, and migrate it accordingly. So all you need to
 
 1. Remove the current contents of your mod/assign/submission/mahara directory
 2. Follow the steps under "Installation" above. (This will trigger the database upgrade script.)
-3. If you have also installed the Mahara assignment feedback plugin (mod/assign/feedback/mahara), you should now upgrade it to the version at https://github.com/catalyst/moodle-assignfeedback_mahara/tree/moodle26-merged
+3. If you have also installed the Mahara assignment feedback plugin (mod/assign/feedback/mahara), you should now upgrade it to the version at https://github.com/MaharaProject/moodle-assignfeedback_mahara/tree/moodle26-merged
 4. If you have also installed the Mahara local plugin (local/mahara), you should now uninstall it.
 
 About those patches
