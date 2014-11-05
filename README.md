@@ -1,8 +1,8 @@
 moodle-assignsubmission-mahara
 ============================
 
-Mahara assignment submission plugin for Moodle 2.6
-- https://github.com/MaharaProject/moodle-assignsubmission-mahara/tree/moodle26
+Mahara assignment submission plugin for Moodle 2.7
+- https://github.com/MaharaProject/moodle-assignsubmission-mahara/tree/moodle27
 
 This plugin adds Mahara pages submission functionality to assignments in Moodle.
 The plugin works with the new "mod/assign" type introduced in 2.3. It requires 
@@ -31,7 +31,7 @@ Installation
 ------------
 1. Make sure that your Moodle and Mahara versions are up to date.
 2. If you are using Mahara 1.9 or earlier, apply the patch "mahara-patch.txt" to your Mahara site.
-3. If you are using Moodle 2.6 or earlier, apply the patch "moodle-patch.txt" to your Moodle site.
+3. If you are using Moodle 2.7 or earlier, apply the patch "moodle-patch.txt" to your Moodle site.
 4. Copy the contents of this project to mod/assign/submission/mahara in your Moodle site.
 5. Proceed with plugin installation in Moodle.
 6. On the Moodle page "Site Admin" -> "Networking" -> "Peers", choose the Mahara site.
