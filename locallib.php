@@ -151,7 +151,7 @@ class assign_submission_mahara extends assign_submission_plugin {
         if ($submission) {
             $maharasubmission = $this->get_mahara_submission($submission->id);
         }
-        if ($maharasubmission) {
+        if (!empty($maharasubmission)) {
             $selectedid = $maharasubmission->viewid;
             $selectediscollection = $maharasubmission->iscollection;
         }
@@ -162,41 +162,45 @@ class assign_submission_mahara extends assign_submission_plugin {
 
         // Getting views (pages) user have in linked site.
         $views = $this->mnet_get_views();
-		if ($views) {
-		    // Filter out collection views, special views, and already-submitted views (except the current one)
-		    foreach ($views['data'] as $i => $view) {
-		        if (
-		                $view['collid']
-		                || $view['type'] != 'portfolio'
-		                || (
-		                        $view['submittedtime']
-		                        && !($view['id'] == $selectedid && $selectediscollection == false)
-		                )
-		        ) {
-		            unset($views['ids'][$i]);
-		            unset($views['data'][$i]);
-		            $views['count']--;
-		        }
-		    }
-		    // Filter out empty or submitted collections
-		    foreach ($views['collections']['data'] as $i => $coll) {
-		        if (
-		                (
-		                        array_key_exists('numviews', $coll)
-		                        && $coll['numviews'] == 0
-		                ) || (
-		                        $coll['submittedtime']
-		                        && !($coll['id'] == $selectedid && $selectediscollection == true)
-		                )
-		        ) {
-		            unset($views['collections']['data'][$i]);
-		            $views['collections']['count']--;
-		        }
-		    }
-		    $viewids = $views['ids'];
-		} else {
-			$viewids = array();
-		}
+        if (!$views) {
+            $views = array(
+                    'data' => array(),
+                    'collections' => array('data' => array()),
+                    'ids' => array(),
+            );
+        }
+
+	    // Filter out collection views, special views, and already-submitted views (except the current one)
+	    foreach ($views['data'] as $i => $view) {
+	        if (
+	                $view['collid']
+	                || $view['type'] != 'portfolio'
+	                || (
+	                        $view['submittedtime']
+	                        && !($view['id'] == $selectedid && $selectediscollection == false)
+	                )
+	        ) {
+	            unset($views['ids'][$i]);
+	            unset($views['data'][$i]);
+	            $views['count']--;
+	        }
+	    }
+	    // Filter out empty or submitted collections
+	    foreach ($views['collections']['data'] as $i => $coll) {
+	        if (
+	                (
+	                        array_key_exists('numviews', $coll)
+	                        && $coll['numviews'] == 0
+	                ) || (
+	                        $coll['submittedtime']
+	                        && !($coll['id'] == $selectedid && $selectediscollection == true)
+	                )
+	        ) {
+	            unset($views['collections']['data'][$i]);
+	            $views['collections']['count']--;
+	        }
+	    }
+	    $viewids = $views['ids'];
 
         // Prepare the header.
         $remotehost = $DB->get_record('mnet_host', array('id'=>$this->get_config('mnethostid')));
