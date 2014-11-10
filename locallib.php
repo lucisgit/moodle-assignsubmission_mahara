@@ -784,7 +784,14 @@ class assign_submission_mahara extends assign_submission_plugin {
         $result = '';
         $maharasubmission = $this->get_mahara_submission($submission->id);
         if ($maharasubmission) {
-            $lastattempt = $DB->get_field('assign_submission', 'max(attemptnumber)', array('assignment' => $submission->assignment, 'groupid' => $submission->groupid, 'userid'=>$submission->userid));
+            $fields = array( 'assignment' => $submission->assignment );
+            if (!empty($submission->groupid)) {
+                $fields['groupid'] = $submission->groupid;
+            }
+            if (!empty($submission->userid)) {
+                $fields['userid'] = $submission->userid;
+            }
+            $lastattempt = $DB->get_field('assign_submission', 'max(attemptnumber)', $fields);
             if ($submission->attemptnumber < $lastattempt) {
                 $result .= get_string('previousattemptsnotvisible', 'assignsubmission_mahara');
             } else {
