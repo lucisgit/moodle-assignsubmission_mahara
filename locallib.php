@@ -647,7 +647,7 @@ class assign_submission_mahara extends assign_submission_plugin {
                 !$this->get_config('lock')
                 || !$maharasubmission
                 || !$maharasubmission->viewid
-                || $maharasubmission->status == self::STATUS_SUBMITTED
+                || $maharasubmission->viewstatus == self::STATUS_SUBMITTED
         ) {
             return;
         }
