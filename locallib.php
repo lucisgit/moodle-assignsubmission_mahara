@@ -207,13 +207,10 @@ class assign_submission_mahara extends assign_submission_plugin {
         $url = new moodle_url('/auth/mnet/jump.php', array('hostid' => $remotehost->id));
         $remotehost->jumpurl = $url->out();
 
-        // Updating section header and adding description line.
-        $mform->getElement('header_mahara')->_text = $remotehost->name;
-
         // See if any of views are already in use, we will remove them from select.
         if (count($viewids) || count($views['collections']['data'])) {
 
-            $mform->addElement('static', '', '', get_string('selectmaharaview', 'assignsubmission_mahara', $remotehost));
+            $mform->addElement('static', '', $remotehost->name, get_string('selectmaharaview', 'assignsubmission_mahara', $remotehost));
 
             // Add "none selected" option
             $mform->addElement('radio', 'viewid', '', '(none selected)', 'none');
@@ -259,7 +256,7 @@ class assign_submission_mahara extends assign_submission_plugin {
             $mform->addElement(
                     'static',
                     '',
-                    '',
+                    $remotehost->name,
                     get_string('noviewscreated', 'assignsubmission_mahara', $remotehost)
             );
             $mform->addElement('hidden', 'viewid', 'none');
