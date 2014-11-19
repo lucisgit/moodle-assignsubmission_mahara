@@ -93,3 +93,9 @@ is recommended) note that:
 * If a submission is "reopened" via the Moodle gradebook, the page will become unlocked.
 
 If you need help, try the Moodle-Mahara Integration forum on mahara.org: https://mahara.org/interaction/forum/view.php?id=30
+
+Bugs and Improvements?
+----------------------
+If you've found a bug or if you've made an improvement to this plugin and want to share your code, please
+open an issue in our Github project:
+* https://github.com/MaharaProject/moodle-assignsubmission-mahara/issues
