@@ -621,7 +621,7 @@ class assign_submission_mahara extends assign_submission_plugin {
         $maharasubmission->viewstatus = self::STATUS_SUBMITTED;
 
         if (!$this->get_config('lock')) {
-            if (!$response = $this->mnet_release_submitted_view($maharasubmission->viewid, array(), $maharasubmission->iscollection)) {
+            if ($this->mnet_release_submitted_view($maharasubmission->viewid, array(), $maharasubmission->iscollection) === false) {
                 throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
             }
             $maharasubmission->viewstatus = self::STATUS_RELEASED;
