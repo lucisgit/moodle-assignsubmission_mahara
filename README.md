@@ -31,12 +31,11 @@ Installation
 ------------
 1. Make sure that your Moodle and Mahara versions are up to date.
 2. If you are using Mahara 1.9 or earlier, apply the patch "mahara-patch.txt" to your Mahara site.
-3. If you are using Moodle 2.7 or earlier, apply the patch "moodle-patch.txt" to your Moodle site.
-4. Copy the contents of this project to mod/assign/submission/mahara in your Moodle site.
-5. Proceed with plugin installation in Moodle.
-6. On the Moodle page "Site Admin" -> "Networking" -> "Peers", choose the Mahara site.
+3. Copy the contents of this project to mod/assign/submission/mahara in your Moodle site.
+4. Proceed with plugin installation in Moodle.
+5. On the Moodle page "Site Admin" -> "Networking" -> "Peers", choose the Mahara site.
       Open the "Services" tab and enable "Assign Submission Mahara" services.
-7. Now you may create your first Mahara assignment.
+6. Now you may create your first Mahara assignment.
 
 
 Upgrading
@@ -54,9 +53,7 @@ of the plugin you have installed, and migrate it accordingly. So all you need to
 About those patches
 -------------------
 
-As you may have noticed in the installation instructions, this plugin requires you to apply a patch to your Mahara site and possibly another patch to your Moodle site. The Moodle patch provides an additional hook for the assignment submission plugin to respond when an assignment is reopened. The Mahara patch provides support for the Mahara web services to handle collections.
-
-The Moodle patch has been upstreamed into Moodle 2.7, so if you are using that version or later, you do not need to manually apply the patch file. The Mahara patch is still in the process of code review as of May 2014 (see https://reviews.mahara.org/#/c/3239/ ), targetted for Mahara 1.10.
+As you may have noticed in the installation instructions, this plugin may require you to apply a patch to your Mahara site. The patch provides support for the Mahara web services to handle collections. If you are using Mahara 1.10.0 or later, you DO NOT need to apply this patch, as your Mahara site will already include this functionality.
 
 For information about how to apply a patch file, try Google. If you are using Linux, the process will look something like this:
 
