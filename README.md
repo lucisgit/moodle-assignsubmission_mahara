@@ -1,8 +1,8 @@
-moodle-assignsubmission-mahara
+moodle-assignsubmission_mahara
 ============================
 
 Mahara assignment submission plugin for Moodle 2.7
-- https://github.com/MaharaProject/moodle-assignsubmission-mahara/tree/moodle27
+- https://github.com/MaharaProject/moodle-assignsubmission_mahara
 
 This plugin adds Mahara pages submission functionality to assignments in Moodle.
 The plugin works with the new "mod/assign" type introduced in 2.3. It requires 
@@ -17,7 +17,7 @@ same as if it had been submitted to a Mahara group. However, unlike group submis
 pages and collections submitted to Moodle remain permanently locked even after grading.
 If you'd like the submitted pages and collections to be unlocked after grading, install 
 the Mahara assignment feedback plugin for Moodle:
-https://github.com/MaharaProject/moodle-assignfeedback-mahara
+https://github.com/MaharaProject/moodle-assignfeedback_mahara
 
 The plugin also allows migrating old Mahara "mod/assignment" assignments to the new
 type. The plugin does not include featues to communicate with the outcomes artefact
@@ -47,7 +47,7 @@ of the plugin you have installed, and migrate it accordingly. So all you need to
 
 1. Remove the current contents of your mod/assign/submission/mahara directory
 2. Follow the steps under "Installation" above. (This will trigger the database upgrade script.)
-3. If you have also installed the Mahara assignment feedback plugin (mod/assign/feedback/mahara), you should now upgrade it to the version at https://github.com/MaharaProject/moodle-assignfeedback_mahara/tree/moodle26-merged
+3. If you have also installed the Mahara assignment feedback plugin (mod/assign/feedback/mahara), you should now upgrade it to the version at https://github.com/MaharaProject/moodle-assignfeedback_mahara
 4. If you have also installed the Mahara local plugin (local/mahara), you should now uninstall it.
 
 About those patches
@@ -95,4 +95,4 @@ Bugs and Improvements?
 ----------------------
 If you've found a bug or if you've made an improvement to this plugin and want to share your code, please
 open an issue in our Github project:
-* https://github.com/MaharaProject/moodle-assignsubmission-mahara/issues
+* https://github.com/MaharaProject/moodle-assignsubmission_mahara/issues
