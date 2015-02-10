@@ -2,7 +2,7 @@ moodle-assignsubmission_mahara
 ============================
 
 Mahara assignment submission plugin for Moodle 2.8
-- https://github.com/MaharaProject/moodle-assignsubmission_mahara/tree/moodle28
+- https://github.com/MaharaProject/moodle-assignsubmission_mahara
 
 This plugin adds Mahara pages submission functionality to assignments in Moodle.
 The plugin works with the new "mod/assign" type introduced in 2.3. It requires 
@@ -47,7 +47,7 @@ of the plugin you have installed, and migrate it accordingly. So all you need to
 
 1. Remove the current contents of your mod/assign/submission/mahara directory
 2. Follow the steps under "Installation" above. (This will trigger the database upgrade script.)
-3. If you have also installed the Mahara assignment feedback plugin (mod/assign/feedback/mahara), you should now upgrade it to the version at https://github.com/MaharaProject/moodle-assignfeedback_mahara/tree/moodle26-merged
+3. If you have also installed the Mahara assignment feedback plugin (mod/assign/feedback/mahara), you should now upgrade it to the version at https://github.com/MaharaProject/moodle-assignfeedback_mahara
 4. If you have also installed the Mahara local plugin (local/mahara), you should now uninstall it.
 
 About those patches
