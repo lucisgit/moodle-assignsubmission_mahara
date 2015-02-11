@@ -101,7 +101,7 @@ open an issue in our Github project:
 Credits
 -------
 
-The original Moodle 1.9 version of the assignment submission pluginwas funded through a grant from the New Hampshire Department of Education to a collaborative group of the following New Hampshire school districts:
+The original Moodle 1.9 version of this plugin was funded through a grant from the New Hampshire Department of Education to a collaborative group of the following New Hampshire school districts:
 
  - Exeter Region Cooperative
  - Windham
@@ -115,9 +115,10 @@ The upgrade to Moodle 2.0 and 2.1 was written by Aaron Wells at Catalyst IT, and
  - NetSpot
  - Pukunui Technology
 
-The assignment feedback plugin was developed by:
+The upgrade to the Moodle 2.3 mod/assign module was developed by:
 
  - University of Portland by Philip Cali and Tony Box (box@up.edu)
+ - Lancaster University
 
 Subsequent updates to the plugin were implemented by Aaron Wells at Catalyst IT, with funding from:
 
