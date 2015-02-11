@@ -93,6 +93,45 @@ If you need help, try the Moodle-Mahara Integration forum on mahara.org: https:/
 
 Bugs and Improvements?
 ----------------------
+
 If you've found a bug or if you've made an improvement to this plugin and want to share your code, please
 open an issue in our Github project:
 * https://github.com/MaharaProject/moodle-assignsubmission_mahara/issues
+
+Credits
+-------
+
+The original Moodle 1.9 version of the assignment submission pluginwas funded through a grant from the New Hampshire Department of Education to a collaborative group of the following New Hampshire school districts:
+
+ - Exeter Region Cooperative
+ - Windham
+ - Oyster River
+ - Farmington
+ - Newmarket
+ - Timberlane School District
+
+The upgrade to Moodle 2.0 and 2.1 was written by Aaron Wells at Catalyst IT, and supported by:
+
+ - NetSpot
+ - Pukunui Technology
+
+The assignment feedback plugin was developed by:
+
+ - University of Portland by Philip Cali and Tony Box (box@up.edu)
+
+Subsequent updates to the plugin were implemented by Aaron Wells at Catalyst IT, with funding from:
+
+ - University of Brighton
+ - Canberra University
+
+License
+-------
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, version 3 or later of the License.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
