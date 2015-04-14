@@ -213,7 +213,7 @@ class assign_submission_mahara extends assign_submission_plugin {
             $mform->addElement('static', '', $remotehost->name, get_string('selectmaharaview', 'assignsubmission_mahara', $remotehost));
 
             // Add "none selected" option
-            $mform->addElement('radio', 'viewid', '', '(none selected)', 'none');
+            $mform->addElement('radio', 'viewid', '', get_string('noneselected', 'assignsubmission_mahara'), 'none');
             $mform->setType('viewid', PARAM_ALPHANUM);
             $mform->setDefault('viewid', 'none');
 
