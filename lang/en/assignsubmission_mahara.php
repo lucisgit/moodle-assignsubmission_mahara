@@ -43,6 +43,7 @@ $string['lockpages'] = 'Lock submitted pages';
 $string['lockpages_help'] = 'If set, submitted Mahara pages and collections will be locked from editing in Mahara. (If you are also using the Mahara feedback plugin, they will be unlocked once the submission is graded.)';
 $string['mahara'] = 'Mahara portfolio';
 $string['nomaharahostsfound'] = 'No mahara hosts found.';
+$string['noneselected'] = 'None selected';
 $string['noviewscreated'] = 'You have no available Mahara pages or collections. Please <a target="_blank" href="{$a->jumpurl}">click here</a> to visit "{$a->name}" and create a new one.';
 $string['option_collections'] = 'Collections';
 $string['option_views'] = 'Views';
