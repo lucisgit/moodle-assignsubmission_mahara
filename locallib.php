@@ -916,7 +916,9 @@ class assign_submission_mahara extends assign_submission_plugin {
         );
         foreach ($records as $record) {
             if ($this->mnet_release_submitted_view($record->viewid, array(), $record->iscollection) === false) {
-                throw new moodle_exception('errormnetrequest', 'assignsubmission_mahara', '', $this->get_error());
+                // A problem on the Mahara side should not prevent the assignment from being deleted.
+                // But it's worth printing a message to the error logs.
+                debugging(get_string('errormnetrequest', 'assignsubmission_mahara', $this->get_error()));
             }
         }
         // Now delete records.
