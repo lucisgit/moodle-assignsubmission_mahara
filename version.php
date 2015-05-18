@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015021001;
+$plugin->version   = 2015021003;
 $plugin->requires  = 2014111000;
 $plugin->component = 'assignsubmission_mahara';
 $plugin->maturity  = MATURITY_STABLE;
