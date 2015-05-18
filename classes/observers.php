@@ -23,6 +23,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+require_once($CFG->dirroot . '/mod/assign/submission/mahara/lib.php');
 
 /**
  * Event handler for assign_submission_mahara plugin.
@@ -41,6 +42,12 @@ class assignsubmission_mahara_observers {
         $eventdata = $event->get_data();
         $grade = $event->get_record_snapshot('assign_grades', $eventdata['objectid']);
         $assign = $event->get_assign();
+        $maharasubmissionplugin = $assign->get_submission_plugin_by_type('mahara');
+
+        // See if need to unlock anything at all.
+        if ((int)$maharasubmissionplugin->get_config('lock') !== ASSIGNSUBMISSION_MAHARA_SETTING_UNLOCK) {
+            return;
+        }
 
         // Get submission if it exists.
         if (!$submission = $assign->get_user_submission($grade->userid, false)) {
@@ -63,7 +70,7 @@ class assignsubmission_mahara_observers {
                 return;
             }
 
-            self::release_submited_view($assign, $maharasubmission);
+            self::release_submited_view($maharasubmissionplugin, $maharasubmission);
         }
     }
 
@@ -78,6 +85,12 @@ class assignsubmission_mahara_observers {
         global $DB;
         $eventdata = $event->get_data();
         $assign = $event->get_assign();
+        $maharasubmissionplugin = $assign->get_submission_plugin_by_type('mahara');
+
+        // See if need to unlock anything at all.
+        if ((int)$maharasubmissionplugin->get_config('lock') !== ASSIGNSUBMISSION_MAHARA_SETTING_UNLOCK) {
+            return;
+        }
 
         // Get submission if it exists.
         if (!$submission = $assign->get_user_submission($eventdata['relateduserid'], false)) {
@@ -94,19 +107,18 @@ class assignsubmission_mahara_observers {
                 return;
             }
 
-            self::release_submited_view($assign, $maharasubmission);
+            self::release_submited_view($maharasubmissionplugin, $maharasubmission);
         }
     }
 
    /**
     * Process unlocking Mahara page.
     *
-    * @param \assign $assign
+    * @param \assign_submission_mahara $maharasubmissionplugin
     * @param object $maharasubmission Mahara submission data object.
     * @return void
     */
-    protected static function release_submited_view($assign, $maharasubmission) {
-        $maharasubmissionplugin = $assign->get_submission_plugin_by_type('mahara');
+    protected static function release_submited_view($maharasubmissionplugin, $maharasubmission) {
         // Relese submitted page, but provide no outcomes.
         $maharasubmissionplugin->mnet_release_submitted_view(
             $maharasubmission->viewid,

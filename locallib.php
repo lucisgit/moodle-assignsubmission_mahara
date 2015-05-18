@@ -99,7 +99,12 @@ class assign_submission_mahara extends assign_submission_plugin {
             $mform->disabledIf('assignsubmission_mahara_mnethostid', 'assignsubmission_mahara_enabled', 'notchecked');
 
             // Menu to select whether to lock Mahara pages or not
-            $mform->addElement('selectyesno', 'assignsubmission_mahara_lockpages', new lang_string('lockpages', 'assignsubmission_mahara'));
+            $locksettings = array(
+                ASSIGNSUBMISSION_MAHARA_SETTING_DONTLOCK => new lang_string('no'),
+                ASSIGNSUBMISSION_MAHARA_SETTING_KEEPLOCKED => new lang_string('yeskeeplocked', 'assignsubmission_mahara'),
+                ASSIGNSUBMISSION_MAHARA_SETTING_UNLOCK => new lang_string('yesunlock', 'assignsubmission_mahara')
+            );
+            $mform->addElement('select', 'assignsubmission_mahara_lockpages', get_string('lockpages', 'assignsubmission_mahara'), $locksettings);
             $mform->setDefault('assignsubmission_mahara_lockpages', $locked);
             $mform->addHelpButton('assignsubmission_mahara_lockpages', 'lockpages', 'assignsubmission_mahara');
             $mform->disabledIf('assignsubmission_mahara_lockpages', 'assignsubmission_mahara_enabled', 'notchecked');
