@@ -60,8 +60,6 @@ For information about how to apply a patch file, try Google. If you are using Li
 ```Shell
 cd /var/www/path/to/mahara
 patch -p0 < /path/to/mahara-patch.txt
-cd /var/www/path/to/moodle
-patch -p0 < /path to/moodle-patch.txt
 ```
 
 A little info about what it does:
