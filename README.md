@@ -50,8 +50,8 @@ of the plugin you have installed, and migrate it accordingly. So all you need to
 3. If you have also installed the Mahara assignment feedback plugin (mod/assign/feedback/mahara), you should now upgrade it to the version at https://github.com/MaharaProject/moodle-assignfeedback_mahara
 4. If you have also installed the Mahara local plugin (local/mahara), you should now uninstall it.
 
-About those patches
--------------------
+About that patch
+----------------
 
 As you may have noticed in the installation instructions, this plugin may require you to apply a patch to your Mahara site. The patch provides support for the Mahara web services to handle collections. If you are using Mahara 1.10.0 or later, you DO NOT need to apply this patch, as your Mahara site will already include this functionality.
 
