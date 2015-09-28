@@ -167,7 +167,7 @@ function xmldb_assignsubmission_mahara_upgrade($oldversion) {
         foreach ($records as $record) {
             $DB->execute("UPDATE {assign_plugin_config} SET value = '2' WHERE plugin = 'mahara' AND subtype = 'assignsubmission' AND name = 'lock' AND value = '1'");
         }
-        upgrade_plugin_savepoint(true, 2014110503, 'assignsubmission', 'mahara');
+        upgrade_plugin_savepoint(true, 2015021002, 'assignsubmission', 'mahara');
     }
 
     if ($oldversion < 2015021003) {
@@ -187,7 +187,7 @@ function xmldb_assignsubmission_mahara_upgrade($oldversion) {
         }
 
         // Mahara savepoint reached.
-        upgrade_plugin_savepoint($result, 2014110504, 'assignsubmission', 'mahara');
+        upgrade_plugin_savepoint($result, 2015021003, 'assignsubmission', 'mahara');
     }
 
     return true;
