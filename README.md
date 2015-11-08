@@ -4,7 +4,7 @@ moodle-assignsubmission_mahara
 Mahara assignment submission plugin for Moodle 2.7 onwards.
 - https://github.com/MaharaProject/moodle-assignsubmission_mahara
 
-This plugin adds Mahara pages submission functionality to assignments in
+This plugin adds Mahara page submission functionality to assignments in
 Moodle.  The plugin works with the new "mod/assign" type introduced in 2.3.
 It requires at least one Mahara site linked to Moodle via MNet.
 
@@ -45,17 +45,14 @@ migrate it accordingly. So all you need to do is:
 
 1. Remove the current contents of your mod/assign/submission/mahara directory.
 2. Follow the steps under "Installation" above. (This will trigger the database upgrade script.)
-3. If you have installed the Mahara assignment feedback plugin (mod/assign/feedback/mahara), upgrade will prompt you to uninstall it, you will then need to remove its directory.
-4. If you have also installed the Mahara local plugin (local/mahara), you should now uninstall it and remove directory.
+3. If you have installed the Mahara assignment feedback plugin (mod/assign/feedback/mahara), the upgrade will prompt you to uninstall it. You will then need to remove its directory.
+4. If you have also installed the Mahara local plugin (local/mahara), you should now uninstall it and remove its directory.
 
-Important to note, if you were using Mahara assignment feedback plugin
-before, you need to start upgrade assignsubmission plugin before removing
-the assignment feedback plugin (that is why it is in step 3 above),
-feedback plugin settings will be used to enable unlocking in the upgraded
-assignments settings that were using assignfeedback previously. However,
-when upgrade will indicate that feedback plugin need to be removed, do so
-as upgraded version is conflicting with feedback plugin. It will suggest
-feedback plugin removing after settings have been imported.
+NOTE: If you were using the Mahara assignment feedback plugin before, you need
+to upgrade this assignment submission plugin BEFORE uninstalling the assignment
+feedback plugin. This is to allow the per-assignment locking settings from
+the feedback plugin to be migrated into the replacement system in the 
+submission plugin.
 
 About that patch
 ----------------
@@ -85,23 +82,23 @@ submission. (Therefore, this plugin requires your Moodle site to be connected to
 Mahara site via MNet.)
 
 * Individual pages that are part of collections cannot be picked on their own (the entire collection must be picked instead).
-* Pages or collections that are already locked due to being submitted to a Mahara group or another Moodle assignment, are also not available.
+* Pages and collections that are already locked due to being submitted to a Mahara group or another Moodle assignment, are also not available.
 
 Optionally, the assignment may lock the submitted pages and collections
 from being edited in Mahara. This is recommended, because otherwise
 students will be able to continue editing part of their assignment
-submission even after the assignment deadline. Teacher may choose whether
-submitted page or collection will be unlocked after grading or when grading
-workflow state changed to "Release".
+submission even after the assignment deadline. The teacher may choose whether
+submitted pages and collection will be unlocked after grading, or when the 
+grading workflow state changes to "Released".
 
 If you choose to use locking, note that:
 * Pages & collections that are part of a draft submission will be not be locked until the draft is submitted.
 * The Mahara page will be locked if the submission is submitted OR the submission is "locked" via the Moodle gradebook.
 * If a submission is "reopened" via the Moodle gradebook, the page will become unlocked.
 
-If locking setting permits unlock after grading:
+If the locking setting permits unlock after grading:
 * If grading workflow is disabled, then grading the work will result in page unlocking.
-* If grading workflow is enabled, then page unlocking will only happen at the point when workflow state will changed to "Released" irrespective whether submission has been graded or not prior to that.
+* If grading workflow is enabled, then page unlocking will happen at the point when workflow state changes to "Released", whether the submission has been graded or not prior to that.
 
 If you need help, try the Moodle-Mahara Integration forum on mahara.org: https://mahara.org/interaction/forum/view.php?id=30
 
