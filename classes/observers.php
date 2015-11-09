@@ -70,7 +70,7 @@ class assignsubmission_mahara_observers {
                 return;
             }
 
-            self::release_submited_view($maharasubmissionplugin, $maharasubmission);
+            self::release_submitted_view($maharasubmissionplugin, $maharasubmission);
         }
     }
 
@@ -107,7 +107,7 @@ class assignsubmission_mahara_observers {
                 return;
             }
 
-            self::release_submited_view($maharasubmissionplugin, $maharasubmission);
+            self::release_submitted_view($maharasubmissionplugin, $maharasubmission);
         }
     }
 
@@ -118,7 +118,7 @@ class assignsubmission_mahara_observers {
     * @param object $maharasubmission Mahara submission data object.
     * @return void
     */
-    protected static function release_submited_view($maharasubmissionplugin, $maharasubmission) {
+    protected static function release_submitted_view($maharasubmissionplugin, $maharasubmission) {
         // Relese submitted page, but provide no outcomes.
         $maharasubmissionplugin->mnet_release_submitted_view(
             $maharasubmission->viewid,
