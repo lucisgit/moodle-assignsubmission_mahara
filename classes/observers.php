@@ -66,7 +66,7 @@ class assignsubmission_mahara_observers {
             }
 
             // If submission has been "graded" but no grade is selected do not unlock page.
-            if (empty($grade->grade)) {
+            if ($grade->grade == -1 || $grade->grade === null) {
                 return;
             }
 
