@@ -165,7 +165,8 @@ function xmldb_assignsubmission_mahara_upgrade($oldversion) {
         // Now update assignment settings, making unlocking enabled in assignment lock
         // setting for those where assignfeedback_mahara was enabled.
         foreach ($records as $record) {
-            $DB->execute("UPDATE {assign_plugin_config} SET value = '2' WHERE plugin = 'mahara' AND subtype = 'assignsubmission' AND name = 'lock' AND value = '1'");
+            $sql = "UPDATE {assign_plugin_config} SET value = '2' WHERE plugin = 'mahara' AND subtype = 'assignsubmission' AND name = 'lock' AND value = '1' AND assignment = ?";
+            $DB->execute($sql, array($record->assignment));
         }
         upgrade_plugin_savepoint(true, 2015021002, 'assignsubmission', 'mahara');
     }
